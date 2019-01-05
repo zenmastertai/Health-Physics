@@ -1,4 +1,5 @@
 import tkinter as tk
+import math
 
 class Root(tk.Tk):
     def __init__(self):
@@ -7,24 +8,25 @@ class Root(tk.Tk):
         #set the title and default geometry of the window
         self.title("Linear Interpolation GUI")
 
-
         #create the frame for the widgets
         self.frame = tk.Frame(self)
 
         #shielding material drop down options/variables
         option_list = ('Lead','Tungsten')
+        self.density = {'Lead':11.34,'Tungsten':19.4}
         self.v = tk.StringVar()
         self.v.set(option_list[0])
 
         #create text box widget
-        self.energy_input = tk.Text(self.frame, height=1, width=6)
+        self.energy_input = tk.Text(self.frame, height=1, width=8)
 
         #create drop down widget
         self.dropdown = tk.OptionMenu(self.frame,self.v,*option_list)
 
         #create label
         self.energy_input_label = tk.Label(self.frame, text="Energy (keV):")
-        self.attenuation_output_label = tk.Label(self.frame, text = "u/p (cm^2/g):")
+        self.attenuation_output_label = tk.Label(self.frame, text="u/p (cm^2/g):")
+        self.shielding_mat_label = tk.Label(self.frame, text="Shielding Material:")
         
         self.outputv = tk.StringVar()
         self.outputv.set('0')
@@ -38,7 +40,9 @@ class Root(tk.Tk):
         
         self.energy_input_label.grid(row=0,column=0, sticky='E')
         self.energy_input.grid(row=0,column=1)
-        self.dropdown.grid(row=1,column=0,sticky='W')
+        self.shielding_mat_label.grid(row=1,column=0,sticky='W')
+        self.dropdown.grid(row=1,column=1,sticky='EW')
+        self.dropdown.configure(width=8) #adjust width of the dropdown
         calculate_button.grid(row=2,column=0,sticky='W')
         
         self.attenuation_output_label.grid(row=0,column=2, sticky='E')
@@ -92,6 +96,9 @@ class Root(tk.Tk):
 
     def calculate(self,event=None):
         e_coef = round(self.interpolate(),4)
+        HVL = math.log(1/2)/-(e_coef*self.density[self.v.get()])
+        TVL = math.log(1/10)/-(e_coef*self.density[self.v.get()])
+        print(HVL)
         self.attenuation_output['text']=str(e_coef)  
         
 if __name__ == "__main__":
