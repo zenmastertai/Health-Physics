@@ -1,6 +1,7 @@
 from isoref import *
 import pickle
 from operator import itemgetter, attrgetter
+import sys
 
 def import_radiation_data(filename):
     data = []
@@ -19,56 +20,30 @@ def import_radiation_data(filename):
 with open('parents.pickle', 'rb') as handle:
     isotope_data = pickle.load(handle)
 
-##for i in range(len(isotope_data["data"])):
-##    if isotope_data["data"][i]["name"] == "Li":
-##        print(isotope_data["data"][i]["ref"])
-
 gamma_db = {"data":[]}
 for i in range(len(isotope_data["data"])):
     gdb = {}
     gdb[isotope_data["data"][i]["ref"]]=[{}]
     gamma_db["data"].append(gdb)
 
-##for i in range(1000):
-##    print(gamma_db["data"][i])
-##    
-##    if '30011' in gamma_db["data"][i]:
-##        print('THE ROW IS ' + str(i))
-
-#gamma_db["data"][0]['120031'][0]['gamma1'] = 123
-#gamma_db["data"][0]['120031'][0]['gamma2'] = 124
-##print(len(gamma_db["data"]))
-print(gamma_db["data"][0])
-
-##if 'gamma1' in gamma_db["data"][0]['120031'][0]:
-##    print("HERE")
-
 gamma_data = import_radiation_data('gammas.txt')
+gamma_data.sort(key=lambda gamma: gamma[1], reverse=False)
 
-testdata = gamma_data[0:20]
-testdata.sort(key=lambda gamma: gamma[1], reverse=False)
-
-##for line in testdata:
-##    print(line)
-
-for i in range(len(testdata)):
+for i in range(len(gamma_data)):
     count = 1
     for j in range(len(gamma_db["data"])):
         try:
-            if 'gamma'+str(count) in gamma_db["data"][j][testdata[i][0]][0]:
+            if 'gamma'+str(count) in gamma_db["data"][j][gamma_data[i][0]][0]:
                 count+=1
             else:
-                gamma_db["data"][j][testdata[i][0]][0]['gamma'+str(count)] = testdata[i][1]
+                gamma_db["data"][j][gamma_data[i][0]][0]['gamma'+str(count)] = gamma_data[i][1]
+                gamma_db["data"][j][gamma_data[i][0]][0]['I'+str(count)] = gamma_data[i][2]
         except KeyError:
             pass
 
-print(gamma_db["data"])
-#the problem is that i need a nested loop here to loop through both gamma_db and testdata
+with open('gamma.pickle', 'wb') as handle:
+    pickle.dump(gamma_db, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-#print(gamma_db['120031'])
-
-
-##print(gamma_db['120031'][0])
 
 
 

@@ -32,21 +32,3 @@ for i in range(len(data)):
     isotope["halflife"] = data[i][4]
     isotope["abund"] = data[i][5]
     isotope_data["data"].append(isotope)
-
-#print(isotope_data["data"][0]["name"])
-
-##x = {}
-##for i in range (10):
-##        x[isotope_data["data"][i]["ref"]]=[{}]
-##        
-##if 'gamma1' in x['120031'][0]:
-##    print("here")
-##else:
-##    print("not here")
-
-#x['120031'][0]['gamma1'] = 123
-#x['120031'][0]['gamma1'] = 124
-#print(x['120031'][0]['gamma1'])
-
-##with open('parents.pickle', 'wb') as handle:
-##    pickle.dump(isotope_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
