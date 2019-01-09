@@ -1,5 +1,6 @@
 import pickle
 
+#import parents data
 data = []
 file = open('parents.txt')
 for line in file:
@@ -22,13 +23,26 @@ for line in file:
     data.append(tmp_data)
 file.close()
 
-isotope_data = { "data":[]}
+#sort the array by isotope reference
+data.sort(key=lambda isotope: isotope[3], reverse=False)
+
+#put all isotope data into dictionary associated with isotope reference
+isotope_data = {}
 for i in range(len(data)):
     isotope = {}
     isotope["A"] = data[i][0]
     isotope["Z"] = data[i][1]
     isotope["name"] = data[i][2]
-    isotope["ref"] = data[i][3]
     isotope["halflife"] = data[i][4]
     isotope["abund"] = data[i][5]
-    isotope_data["data"].append(isotope)
+    isotope_data[data[i][3]]=isotope
+
+#export dictionary to pickle file
+with open('parents.pickle', 'wb') as handle:
+    pickle.dump(isotope_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+
+
+
+    
