@@ -62,16 +62,18 @@ def export_db(radiation,filename):
     #associate every gamma-ray radiation and it's intesnity with it's isotope
     for line in radiation_data:
         count = 1
-        try:
-            if radiation+str(count) in radiation_db[line[0]]:
-                count+=1
-            else:
-                radiation_db[line[0]]['gamma'+str(count)] = line[1]
-                radiation_db[line[0]]['I'+str(count)] = line[2]
-        except KeyError:
-            pass        
-
-    #export to 
+        test = False
+        while test == False:
+            try:
+                if radiation+str(count) in radiation_db[line[0]]:
+                    count+=1
+                else:
+                    radiation_db[line[0]]['gamma'+str(count)] = line[1]
+                    radiation_db[line[0]]['I'+str(count)] = line[2]
+                    test = True
+            except KeyError:
+                pass        
+    #export to
     with open(radiation+".pickle", 'wb') as handle:
         pickle.dump(radiation_db, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
