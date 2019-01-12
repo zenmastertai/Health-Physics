@@ -4,7 +4,7 @@ import tkinter.messagebox as msg
 from isoref import *
 
 class Root(tk.Tk):
-    def __init__(self,rads=None):
+    def __init__(self,rads=None,I=None):
         super().__init__()
 
         #import data for gamma, beta, and alpha radiation
@@ -22,8 +22,10 @@ class Root(tk.Tk):
 
         if not rads:
             self.rads = []
+            self.I = []
         else:
             self.rads = rads
+            self.I = I
             
         self.title("Table of Radioactive Isotopes Lookup")
         self.geometry("800x600")
@@ -98,19 +100,27 @@ class Root(tk.Tk):
             msg.askokcancel("Confirm", "Please enter a nuclide")
 
     def translate_isotope(self,isotope=None,A=None):
+        #test variable for error checking
         test = False
         try:
+            #look up the Z from nuclides dictionary
             Z = str(nuclides[isotope])
         except KeyError:
+            #if the isotope isnt in the first dictionary, try the second
             try:
                 Z = nuclides_long[isotope]
             except KeyError:
+                #if not in the second, user entered invalid isotope
                 msg.askokcancel("Error", "Valid Nuclide Not Entered")
                 test = True
+        #test to see if a metastable isotope was entered
         if not test:
+            #if yes, add 300 to A and format appropriately
             if A[-1:] == 'm':
                 A = str(int(A.replace('m',''))+300)
                 ref = Z + "0" + A
+            #if no, format appropriate according to # of decimal
+            #places in A.
             else:
                 if int(A) < 10:
                     A = "00" + A
@@ -119,33 +129,27 @@ class Root(tk.Tk):
                 ref = Z + "0" + A
         self.add_radiation(ref,self.gamma_db)
 
-    def add_radiation(self,ref=None,g_db=None):
-
+    def add_radiation(self,ref=None,r_db=None):
+        #clear any existing radiation labels 
+        for rad in self.rads:
+            rad.destroy()
+        for i in self.I:
+            i.destroy()
+        self.rads = []
+        self.I = []
+        #add radiation energies of given type as labels
         count = 1
         row = 3
         g_num = int(len(g_db[ref])/2)
         for i in range(g_num):
-            new_rad = tk.Label(self.frame,text=g_db[ref]['gamma'+str(count)])
-            new_rad_I = tk.Label(self.frame,text=g_db[ref]['I'+str(count)])
+            new_rad = tk.Label(self.frame,text=r_db[ref]['gamma'+str(count)])
+            new_rad_I = tk.Label(self.frame,text=r_db[ref]['I'+str(count)])
             new_rad.grid(row=row,column=0)
             new_rad_I.grid(row=row,column=1)
+            self.rads.append(new_rad)
+            self.I.append(new_rad_I)
             row+=1
-            count+=1
-
-        #print(len(g_db[ref]))
-                    
-
-
-            
-        #print(isotope,A)
-        
-        
-        
-
-        
-        
-    
-        
+            count+=1     
 
 
 if __name__ == "__main__":
