@@ -140,7 +140,7 @@ class Root(tk.Tk):
         #add radiation energies of given type as labels
         count = 1
         row = 3
-        g_num = int(len(g_db[ref])/2)
+        g_num = int(len(r_db[ref])/2)
         for i in range(g_num):
             new_rad = tk.Label(self.frame,text=r_db[ref]['gamma'+str(count)])
             new_rad_I = tk.Label(self.frame,text=r_db[ref]['I'+str(count)])
