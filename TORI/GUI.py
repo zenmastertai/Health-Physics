@@ -4,7 +4,7 @@ import tkinter.messagebox as msg
 from isoref import *
 
 class Root(tk.Tk):
-    def __init__(self,rads=None,I=None):
+    def __init__(self):
         super().__init__()
 
         #import data for gamma, beta, and alpha radiation
@@ -17,15 +17,13 @@ class Root(tk.Tk):
         with open('alpha.pickle', 'rb') as handle:
             self.alpha_db = pickle.load(handle)
 
-        with open('alpha.pickle', 'rb') as handle:
-            self.alpha_db = pickle.load(handle)
+        self.y_rads = [] #gamma
+        self.b_rads = [] #beta
+        self.a_rads = [] #alpha
 
-        if not rads:
-            self.rads = []
-            self.I = []
-        else:
-            self.rads = rads
-            self.I = I
+        self.y_I = [] #gamma
+        self.b_I = [] #beta
+        self.a_I = [] #alpha
             
         self.title("Table of Radioactive Isotopes Lookup")
         self.geometry("800x600")
@@ -127,29 +125,75 @@ class Root(tk.Tk):
                 elif int(A) >= 10 and int(A) <100:
                     A = "0" + A
                 ref = Z + "0" + A
-        self.add_radiation(ref,self.gamma_db)
+        self.add_radiation(ref)
 
-    def add_radiation(self,ref=None,r_db=None):
-        #clear any existing radiation labels 
-        for rad in self.rads:
+    def add_radiation(self,ref=None):
+
+        #clear any existing radiation labels
+        for rad in self.y_rads:
             rad.destroy()
-        for i in self.I:
+        for i in self.y_I:
             i.destroy()
-        self.rads = []
-        self.I = []
-        #add radiation energies of given type as labels
+        self.y_rads = []
+        self.y_I = []
+
+        #clear any existing radiation labels
+        for rad in self.b_rads:
+            rad.destroy()
+        for i in self.b_I:
+            i.destroy()
+        self.b_rads = []
+        self.b_I = []
+
+        #clear any existing radiation labels
+        for rad in self.a_rads:
+            rad.destroy()
+        for i in self.a_I:
+            i.destroy()
+        self.a_rads = []
+        self.a_I = []
+        
+        #add radiation energies of gamma rays
         count = 1
         row = 3
-        g_num = int(len(g_db[ref])/2)
-        for i in range(g_num):
-            new_rad = tk.Label(self.frame,text=r_db[ref]['gamma'+str(count)])
-            new_rad_I = tk.Label(self.frame,text=r_db[ref]['I'+str(count)])
+        r_num = int(len(self.gamma_db[ref])/2) #determine number of radiations of each type
+        for i in range(r_num):
+            new_rad = tk.Label(self.frame,text=self.gamma_db[ref]['gamma'+str(count)])
+            new_rad_I = tk.Label(self.frame,text=self.gamma_db[ref]['I'+str(count)])
             new_rad.grid(row=row,column=0)
             new_rad_I.grid(row=row,column=1)
-            self.rads.append(new_rad)
-            self.I.append(new_rad_I)
+            self.y_rads.append(new_rad)
+            self.y_I.append(new_rad_I)
             row+=1
-            count+=1     
+            count+=1
+
+        #add radiation energies of beta particles
+        count = 1
+        row = 3
+        r_num = int(len(self.beta_db[ref])/2) #determine number of radiations of each type
+        for i in range(r_num):
+            new_rad = tk.Label(self.frame,text=self.beta_db[ref]['beta'+str(count)])
+            new_rad_I = tk.Label(self.frame,text=self.beta_db[ref]['I'+str(count)])
+            new_rad.grid(row=row,column=2)
+            new_rad_I.grid(row=row,column=3)
+            self.b_rads.append(new_rad)
+            self.b_I.append(new_rad_I)
+            row+=1
+            count+=1
+
+        #add radiation energies of alpha particles
+        count = 1
+        row = 3
+        r_num = int(len(self.alpha_db[ref])/2) #determine number of radiations of each type
+        for i in range(r_num):
+            new_rad = tk.Label(self.frame,text=self.alpha_db[ref]['alpha'+str(count)])
+            new_rad_I = tk.Label(self.frame,text=self.alpha_db[ref]['I'+str(count)])
+            new_rad.grid(row=row,column=4)
+            new_rad_I.grid(row=row,column=5)
+            self.a_rads.append(new_rad)
+            self.a_I.append(new_rad_I)
+            row+=1
+            count+=1 
 
 
 if __name__ == "__main__":

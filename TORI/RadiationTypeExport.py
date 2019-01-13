@@ -68,7 +68,7 @@ def export_db(radiation,filename):
                 if radiation+str(count) in radiation_db[line[0]]:
                     count+=1
                 else:
-                    radiation_db[line[0]]['gamma'+str(count)] = line[1]
+                    radiation_db[line[0]][radiation+str(count)] = line[1]
                     radiation_db[line[0]]['I'+str(count)] = line[2]
                     test = True
             except KeyError:
