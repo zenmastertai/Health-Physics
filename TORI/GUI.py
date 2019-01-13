@@ -40,7 +40,10 @@ class Root(tk.Tk):
         #--Labels-------------------------------------------
         self.isotope_input_label = tk.Label(self.frame,text="Isotope:")
         self.isotope_input_label2 = tk.Label(self.frame,text="(Ex: Cs-137, cs137, cesium-137, cesium137)")
-        self.radiation_label = tk.Label(self.frame,text="---Radiations go here---",bg="lightgrey",fg="black")
+        self.gamma_label = tk.Label(self.frame,text="Gamma-Rays",bg='red')
+        self.beta_label = tk.Label(self.frame,text="Beta Particles",bg='lightgrey')
+        self.alpha_label = tk.Label(self.frame,text="Alpha Particles",bg='red')
+        #self.radiation_label = tk.Label(self.frame,text="---Radiations go here---",bg="lightgrey",fg="black")
 
         #--Binds--------------------------------------------
         self.search_button.bind("<Button-1>",self.search)
@@ -50,7 +53,10 @@ class Root(tk.Tk):
         self.isotope_input_label.grid(row=0,column=0)
         self.isotope_input_label2.grid(row=0,column=2)
         self.isotope_input.grid(row=0,column=1)
-        self.radiation_label.grid(row=2,column=0,columnspan=4,sticky='WENS')
+        #self.radiation_label.grid(row=2,column=0,columnspan=4,sticky='WENS')
+        self.gamma_label.grid(row=2,column=0,columnspan=2,sticky='EWNS')
+        self.beta_label.grid(row=2,column=2,columnspan=2,sticky='WENS')
+        self.alpha_label.grid(row=2,column=4,columnspan=2,sticky='WENS')
 
         self.search_button.grid(row=1,column=0)
 
