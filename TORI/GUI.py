@@ -26,7 +26,8 @@ class Root(tk.Tk):
         self.a_I = [] #alpha
             
         self.title("Table of Radioactive Isotopes Lookup")
-        self.geometry("800x600")
+        self.geometry("480x370")
+        self.resizable(width=False,height=False)
         self.configure(background="Gray")
         self.columnconfigure(0,weight=1)
         self.rowconfigure(0,weight=1)
@@ -83,7 +84,7 @@ class Root(tk.Tk):
         self.frame_four = tk.Frame(self.master_frame)
         self.frame_four.grid(row=4,column=0,sticky=tk.NW)
         
-        self.canvas = tk.Canvas(self.frame_four,bg='Yellow')
+        self.canvas = tk.Canvas(self.frame_four,bg='Yellow',width=450)
         self.canvas.grid(row=0,column=0)
         self.vsbar = tk.Scrollbar(self.frame_four,orient=tk.VERTICAL, command=self.canvas.yview)
         self.vsbar.grid(row=0,column=1,sticky=tk.NS)
@@ -214,45 +215,69 @@ class Root(tk.Tk):
         
         #add radiation energies of gamma rays
         count = 1
-        row = 4
+        row = 0
         r_num = int(len(self.gamma_db[ref])/2) #determine number of radiations of each type
-        for i in range(r_num):
-            new_rad = tk.Label(self.radiations_frame,text=self.gamma_db[ref]['gamma'+str(count)],width=10)
-            new_rad_I = tk.Label(self.radiations_frame,text=self.gamma_db[ref]['I'+str(count)],width=9)
-            new_rad.grid(row=row,column=0)
-            new_rad_I.grid(row=row,column=1)
+        if r_num!=0:
+            for i in range(r_num):
+                new_rad = tk.Label(self.radiations_frame,text=self.gamma_db[ref]['gamma'+str(count)],width=10)
+                new_rad_I = tk.Label(self.radiations_frame,text=self.gamma_db[ref]['I'+str(count)],width=9)
+                new_rad.grid(row=row,column=0)
+                new_rad_I.grid(row=row,column=1)
+                self.y_rads.append(new_rad)
+                self.y_I.append(new_rad_I)
+                row+=1
+                count+=1
+        elif r_num ==0:
+            new_rad = tk.Label(self.radiations_frame,text="",width=10)
+            new_rad_I = tk.Label(self.radiations_frame,text="",width=9)
+            new_rad.grid(row=0,column=0)
+            new_rad_I.grid(row=0,column=1)
             self.y_rads.append(new_rad)
             self.y_I.append(new_rad_I)
-            row+=1
-            count+=1
 
         #add radiation energies of beta particles
         count = 1
-        row = 4
+        row = 0
         r_num = int(len(self.beta_db[ref])/2) #determine number of radiations of each type
-        for i in range(r_num):
-            new_rad = tk.Label(self.radiations_frame,text=self.beta_db[ref]['beta'+str(count)],width=10)
-            new_rad_I = tk.Label(self.radiations_frame,text=self.beta_db[ref]['I'+str(count)],width=9)
-            new_rad.grid(row=row,column=2)
-            new_rad_I.grid(row=row,column=3)
+        if r_num!=0:
+            for i in range(r_num):
+                new_rad = tk.Label(self.radiations_frame,text=self.beta_db[ref]['beta'+str(count)],width=10)
+                new_rad_I = tk.Label(self.radiations_frame,text=self.beta_db[ref]['I'+str(count)],width=9)
+                new_rad.grid(row=row,column=2)
+                new_rad_I.grid(row=row,column=3)
+                self.b_rads.append(new_rad)
+                self.b_I.append(new_rad_I)
+                row+=1
+                count+=1
+        elif r_num == 0:
+            new_rad = tk.Label(self.radiations_frame,text="",width=10)
+            new_rad_I = tk.Label(self.radiations_frame,text="",width=9)
+            new_rad.grid(row=0,column=2)
+            new_rad_I.grid(row=0,column=3)
             self.b_rads.append(new_rad)
-            self.b_I.append(new_rad_I)
-            row+=1
-            count+=1
+            self.b_I.append(new_rad_I)            
 
         #add radiation energies of alpha particles
         count = 1
-        row = 4
+        row = 0
         r_num = int(len(self.alpha_db[ref])/2) #determine number of radiations of each type
-        for i in range(r_num):
-            new_rad = tk.Label(self.radiations_frame,text=self.alpha_db[ref]['alpha'+str(count)],width=10)
-            new_rad_I = tk.Label(self.radiations_frame,text=self.alpha_db[ref]['I'+str(count)],width=9)
-            new_rad.grid(row=row,column=4)
-            new_rad_I.grid(row=row,column=5)
+        if r_num != 0:
+            for i in range(r_num):
+                new_rad = tk.Label(self.radiations_frame,text=self.alpha_db[ref]['alpha'+str(count)],width=10)
+                new_rad_I = tk.Label(self.radiations_frame,text=self.alpha_db[ref]['I'+str(count)],width=9)
+                new_rad.grid(row=row,column=4)
+                new_rad_I.grid(row=row,column=5)
+                self.a_rads.append(new_rad)
+                self.a_I.append(new_rad_I)
+                row+=1
+                count+=1
+        elif r_num == 0:
+            new_rad = tk.Label(self.radiations_frame,text="",width=10)
+            new_rad_I = tk.Label(self.radiations_frame,text="",width=9)
+            new_rad.grid(row=0,column=4)
+            new_rad_I.grid(row=0,column=5)
             self.a_rads.append(new_rad)
             self.a_I.append(new_rad_I)
-            row+=1
-            count+=1
 
         self.canvas.create_window((0,0), window=self.radiations_frame, anchor=tk.NW)
         self.radiations_frame.update_idletasks()
