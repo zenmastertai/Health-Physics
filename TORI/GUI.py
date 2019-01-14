@@ -27,64 +27,95 @@ class Root(tk.Tk):
             
         self.title("Table of Radioactive Isotopes Lookup")
         self.geometry("800x600")
+        self.configure(background="Gray")
+        self.columnconfigure(0,weight=1)
+        self.rowconfigure(0,weight=1)
 
-        #--Frames-------------------------------------------
-        self.frame = tk.Frame(self)
+        #Master Frame
+        self.master_frame = tk.Frame(self,bg='Light Blue',bd=3,relief=tk.RIDGE)
+        self.master_frame.grid(sticky=tk.NSEW)
+##        for i in range(6):
+##            self.master_frame.columnconfigure(i,weight=1)
 
-        #--Text Box Widget----------------------------------
-        self.isotope_input = tk.Text(self.frame,height=1,width=14)
-
-        #--Button Widget------------------------------------
-        self.search_button = tk.Button(self.frame, text="Search")
-
-        #--Labels-------------------------------------------
-        self.isotope_input_label = tk.Label(self.frame,text="Isotope:")
-        self.isotope_input_label2 = tk.Label(self.frame,text="(Ex: Cs-137, cs137,cesium-137, cesium137)")
+        #Row 0
         
-        self.gamma_label = tk.Label(self.frame,text="Gamma-Rays",bg='red')
-        self.beta_label = tk.Label(self.frame,text="Beta Particles",bg='lightgrey')
-        self.alpha_label = tk.Label(self.frame,text="Alpha Particles",bg='red')
-        #self.radiation_label = tk.Label(self.frame,text="---Radiations go here---",bg="lightgrey",fg="black")
+        self.frame_zero = tk.Frame(self.master_frame)
+        self.frame_zero.grid(row=0,column=0,sticky=tk.NSEW)
+        self.isotope_input_label = tk.Label(self.frame_zero,text="Isotope:")
+        self.isotope_input_label2 = tk.Label(self.frame_zero,text="(Ex: Cs-137, cs137,cesium-137, cesium137)")
+        self.isotope_input = tk.Text(self.frame_zero,height=1,width=14)
+
+        self.isotope_input_label.grid(row=0,column=0,sticky=tk.NSEW)
+        self.isotope_input_label2.grid(row=0,column=2,rowspan=2,sticky=tk.NSEW)
+        self.isotope_input.grid(row=0,column=1,sticky=tk.NSEW)
+
+        #Row 1
+
+        self.frame_one = tk.Frame(self.master_frame)
+        self.frame_one.grid(row=1,column=0,sticky=tk.NSEW)
+        self.search_button = tk.Button(self.frame_one, text="Search",relief=tk.RIDGE)
+        self.search_button.grid(row=0,column=0,sticky=tk.NSEW)
+
+        #Row 2
+
+        self.frame_two = tk.Frame(self.master_frame)
+        self.frame_two.grid(row=2,column=0,sticky=tk.NSEW)
+        self.gamma_label = tk.Label(self.frame_two,text="Gamma-Rays",bg='red',width=20,relief=tk.RIDGE)
+        self.beta_label = tk.Label(self.frame_two,text="Beta Particles",bg='lightgrey',width=20,relief=tk.RIDGE)
+        self.alpha_label = tk.Label(self.frame_two,text="Alpha Particles",bg='red',width=20,relief=tk.RIDGE)        
+        self.gamma_label.grid(row=0,column=0,columnspan=2,sticky=tk.NSEW)
+        self.beta_label.grid(row=0,column=2,columnspan=2,sticky=tk.NSEW)
+        self.alpha_label.grid(row=0,column=4,columnspan=2,sticky=tk.NSEW)
+
+        #Row 3
+        self.frame_three = tk.Frame(self.master_frame)
+        self.frame_three.grid(row=3,column=0,sticky=tk.NSEW)
+        for i in range (6):
+            energy_label = tk.Label(self.frame_three,text="Energy (keV)",width = 10,bd=3,relief=tk.RIDGE)
+            I_label = tk.Label(self.frame_three,text="Intensity %",width = 9,bd=3,relief=tk.RIDGE)
+            if i%2==0:
+                energy_label.grid(row=3,column=i,sticky="E")
+                I_label.grid(row=3,column=i+1,sticky="E")
+                
         
-        self.energy_label1 = tk.Label(self.frame,text="Energy (keV)")
-        self.intensity_label1 = tk.Label(self.frame,text="Intensity %")
-        self.energy_label2 = tk.Label(self.frame,text="Energy (keV)")
-        self.intensity_label2 = tk.Label(self.frame,text="Intensity %")
-        self.energy_label3 = tk.Label(self.frame,text="Energy (keV)")
-        self.intensity_label3 = tk.Label(self.frame,text="Intensity %")
+        #Row 4
+
+        self.frame_four = tk.Frame(self.master_frame)
+        self.frame_four.grid(row=4,column=0,sticky=tk.NW)
         
-        self.test1 = tk.Label(self.frame,text='4',bg='blue',width = 15)
-        self.test2 = tk.Label(self.frame,text='5',bg='red',width=15)
-        self.test3 = tk.Label(self.frame,text='6',bg='red',width=15)
+        self.canvas = tk.Canvas(self.frame_four,bg='Yellow')
+        self.canvas.grid(row=0,column=0)
+        self.vsbar = tk.Scrollbar(self.frame_four,orient=tk.VERTICAL, command=self.canvas.yview)
+        self.vsbar.grid(row=0,column=1,sticky=tk.NS)
+        self.canvas.configure(yscrollcommand=self.vsbar.set)
+
+        self.radiations_frame = tk.Frame(self.canvas,bg='Blue',bd=2)
+
+##        for i in range(1, 20):
+##            for j in range(1, 20):
+##                button = tk.Button(self.radiations_frame, padx=7, pady=7, relief=tk.RIDGE,
+##                                   text="[%d, %d]" % (i, j))
+##                button.grid(row=i, column=j, sticky='news')
+
+        self.canvas.create_window((0,0), window=self.radiations_frame, anchor=tk.NW)
+        self.radiations_frame.update_idletasks()
+        self.canvas.configure(scrollregion=self.canvas.bbox(tk.ALL))
+
+##        self.radiations_frame.update_idletasks()
+##        bbox = self.canvas.bbox(tk.ALL)
+##        w, h = bbox[2]-bbox[1], bbox[3]-bbox[1]
+##        dw, dh = int((w/20) * 4), int((h/20) * 4)
+##        self.canvas.configure(scrollregion=bbox, width=dw, height=dh)
+
 
         #--Binds--------------------------------------------
         self.search_button.bind("<Button-1>",self.search)
         self.isotope_input.bind("<Return>",self.search)
-
-        #--Grid---------------------------------------------
-        self.isotope_input_label.grid(row=0,column=0)
-        self.isotope_input_label2.grid(row=0,column=2)
-        self.isotope_input.grid(row=0,column=1)
-        #self.radiation_label.grid(row=1,column=0,columnspan=4,sticky='WENS')
-        self.gamma_label.grid(row=2,column=0,columnspan=2,sticky='EWNS')
-        self.beta_label.grid(row=2,column=2,columnspan=2,sticky='WENS')
-        self.alpha_label.grid(row=2,column=4,columnspan=2,sticky='WENS')
-        self.test1.grid(row=0,column=3)
-        self.test2.grid(row=0,column=4)
-        self.test3.grid(row=0,column=5)
+        self.bind_all("<MouseWheel>",self.mouse_scroll)
         
-        self.energy_label1.grid(row=3,column=0)
-        self.energy_label2.grid(row=3,column=2)
-        self.energy_label3.grid(row=3,column=4)
-        self.intensity_label1.grid(row=3,column=1)
-        self.intensity_label2.grid(row=3,column=3)
-        self.intensity_label3.grid(row=3,column=5)
 
-        self.search_button.grid(row=1,column=0)
-
-        self.frame.grid()
         self.isotope_input.focus_set()
-
+                                
     #function uses to acquire information from user input
     #passes input along to acquire radiation data from db
     def search(self,event=None):
@@ -186,8 +217,8 @@ class Root(tk.Tk):
         row = 4
         r_num = int(len(self.gamma_db[ref])/2) #determine number of radiations of each type
         for i in range(r_num):
-            new_rad = tk.Label(self.frame,text=self.gamma_db[ref]['gamma'+str(count)])
-            new_rad_I = tk.Label(self.frame,text=self.gamma_db[ref]['I'+str(count)])
+            new_rad = tk.Label(self.radiations_frame,text=self.gamma_db[ref]['gamma'+str(count)],width=10)
+            new_rad_I = tk.Label(self.radiations_frame,text=self.gamma_db[ref]['I'+str(count)],width=9)
             new_rad.grid(row=row,column=0)
             new_rad_I.grid(row=row,column=1)
             self.y_rads.append(new_rad)
@@ -200,8 +231,8 @@ class Root(tk.Tk):
         row = 4
         r_num = int(len(self.beta_db[ref])/2) #determine number of radiations of each type
         for i in range(r_num):
-            new_rad = tk.Label(self.frame,text=self.beta_db[ref]['beta'+str(count)])
-            new_rad_I = tk.Label(self.frame,text=self.beta_db[ref]['I'+str(count)])
+            new_rad = tk.Label(self.radiations_frame,text=self.beta_db[ref]['beta'+str(count)],width=10)
+            new_rad_I = tk.Label(self.radiations_frame,text=self.beta_db[ref]['I'+str(count)],width=9)
             new_rad.grid(row=row,column=2)
             new_rad_I.grid(row=row,column=3)
             self.b_rads.append(new_rad)
@@ -214,15 +245,29 @@ class Root(tk.Tk):
         row = 4
         r_num = int(len(self.alpha_db[ref])/2) #determine number of radiations of each type
         for i in range(r_num):
-            new_rad = tk.Label(self.frame,text=self.alpha_db[ref]['alpha'+str(count)])
-            new_rad_I = tk.Label(self.frame,text=self.alpha_db[ref]['I'+str(count)])
+            new_rad = tk.Label(self.radiations_frame,text=self.alpha_db[ref]['alpha'+str(count)],width=10)
+            new_rad_I = tk.Label(self.radiations_frame,text=self.alpha_db[ref]['I'+str(count)],width=9)
             new_rad.grid(row=row,column=4)
             new_rad_I.grid(row=row,column=5)
             self.a_rads.append(new_rad)
             self.a_I.append(new_rad_I)
             row+=1
-            count+=1 
+            count+=1
 
+        self.canvas.create_window((0,0), window=self.radiations_frame, anchor=tk.NW)
+        self.radiations_frame.update_idletasks()
+        self.canvas.configure(scrollregion=self.canvas.bbox(tk.ALL))
+
+    def mouse_scroll(self, event):
+        if event.delta:
+            self.tasks_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        else:
+            if event.num == 5:
+                move = 1
+            else:
+                move = -1
+
+            self.tasks_canvas.yview_scroll(move, "units")
 
 if __name__ == "__main__":
     window = Root()
