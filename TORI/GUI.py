@@ -1,11 +1,14 @@
 import pickle
 import tkinter as tk
 import tkinter.messagebox as msg
+from tkinter.ttk import Notebook
 from isoref import *
 
 class Root(tk.Tk):
     def __init__(self):
         super().__init__()
+
+#---------Initializing--------------------------------------
 
         #import data for gamma, beta, and alpha radiation
         with open('gamma.pickle', 'rb') as handle:
@@ -16,112 +19,128 @@ class Root(tk.Tk):
 
         with open('alpha.pickle', 'rb') as handle:
             self.alpha_db = pickle.load(handle)
-
+            
         self.y_rads = [] #gamma
         self.b_rads = [] #beta
         self.a_rads = [] #alpha
 
-        self.y_I = [] #gamma
-        self.b_I = [] #beta
-        self.a_I = [] #alpha
+        self.y_I = [] #gamma intensity
+        self.b_I = [] #beta intensity
+        self.a_I = [] #alpha intensity
             
         self.title("Table of Radioactive Isotopes Lookup")
-        self.geometry("480x370")
+        self.geometry("470x370")
         self.resizable(width=False,height=False)
         self.configure(background="Gray")
         self.columnconfigure(0,weight=1)
         self.rowconfigure(0,weight=1)
 
-        #Master Frame
-        self.master_frame = tk.Frame(self,bg='Light Blue',bd=3,relief=tk.RIDGE)
-        self.master_frame.grid(sticky=tk.NSEW)
-##        for i in range(6):
-##            self.master_frame.columnconfigure(i,weight=1)
+#---------Tabs----------------------------------------------
+
+        self.notebook = Notebook(self)
+        
+        self.tori_tab = tk.Frame(self.notebook)
+        self.conversion_tab = tk.Frame(self.notebook)
+        self.decay_tab = tk.Frame(self.notebook)
+
+        self.notebook.add(self.tori_tab,text='TORI')
+        self.notebook.add(self.conversion_tab,text='Conversion')
+        self.notebook.add(self.decay_tab,text='Decay')
+
+
+#-------TORI TAB--------------------------------------------
+
+##        #Master Frame
+##        self.tori_frame = tk.Frame(self,bg='Light Blue',bd=3,relief=tk.RIDGE)
+##        self.tori_frame.grid(sticky=tk.NSEW)
 
         #Row 0
-        
-        self.frame_zero = tk.Frame(self.master_frame)
+        #Create Frame 0
+        self.frame_zero = tk.Frame(self.tori_tab,bd=3,relief=tk.RIDGE)
         self.frame_zero.grid(row=0,column=0,sticky=tk.NSEW)
+        
         self.isotope_input_label = tk.Label(self.frame_zero,text="Isotope:")
         self.isotope_input_label2 = tk.Label(self.frame_zero,text="(Ex: Cs-137, cs137,cesium-137, cesium137)")
-        self.isotope_input = tk.Text(self.frame_zero,height=1,width=14)
+        self.isotope_input = tk.Text(self.frame_zero,height=1,width=20)
 
         self.isotope_input_label.grid(row=0,column=0,sticky=tk.NSEW)
         self.isotope_input_label2.grid(row=0,column=2,rowspan=2,sticky=tk.NSEW)
         self.isotope_input.grid(row=0,column=1,sticky=tk.NSEW)
 
         #Row 1
-
-        self.frame_one = tk.Frame(self.master_frame)
+        #Create Frame 1
+        self.frame_one = tk.Frame(self.tori_tab)
         self.frame_one.grid(row=1,column=0,sticky=tk.NSEW)
-        self.search_button = tk.Button(self.frame_one, text="Search",relief=tk.RIDGE)
+        
+        self.search_button = tk.Button(self.frame_one, text="Search")
         self.search_button.grid(row=0,column=0,sticky=tk.NSEW)
+        self.print_button = tk.Button(self.frame_one, text="Print Data")
+        self.print_button.grid(row=0,column=1,sticky=tk.NSEW)
 
         #Row 2
-
-        self.frame_two = tk.Frame(self.master_frame)
+        #Create Frame 2
+        self.frame_two = tk.Frame(self.tori_tab)
         self.frame_two.grid(row=2,column=0,sticky=tk.NSEW)
-        self.gamma_label = tk.Label(self.frame_two,text="Gamma-Rays",bg='red',width=20,relief=tk.RIDGE)
-        self.beta_label = tk.Label(self.frame_two,text="Beta Particles",bg='lightgrey',width=20,relief=tk.RIDGE)
-        self.alpha_label = tk.Label(self.frame_two,text="Alpha Particles",bg='red',width=20,relief=tk.RIDGE)        
+        
+        self.gamma_label = tk.Label(self.frame_two,text="Gamma-Rays",width=20,relief=tk.RIDGE,padx=2)
+        self.beta_label = tk.Label(self.frame_two,text="Beta Particles",width=20,relief=tk.RIDGE,padx=2)
+        self.alpha_label = tk.Label(self.frame_two,text="Alpha Particles",width=20,relief=tk.RIDGE,padx=3)
+        
         self.gamma_label.grid(row=0,column=0,columnspan=2,sticky=tk.NSEW)
         self.beta_label.grid(row=0,column=2,columnspan=2,sticky=tk.NSEW)
         self.alpha_label.grid(row=0,column=4,columnspan=2,sticky=tk.NSEW)
 
         #Row 3
-        self.frame_three = tk.Frame(self.master_frame)
+        #Create Frame 3
+        self.frame_three = tk.Frame(self.tori_tab)
         self.frame_three.grid(row=3,column=0,sticky=tk.NSEW)
+        
         for i in range (6):
-            energy_label = tk.Label(self.frame_three,text="Energy (keV)",width = 10,bd=3,relief=tk.RIDGE)
-            I_label = tk.Label(self.frame_three,text="Intensity %",width = 9,bd=3,relief=tk.RIDGE)
+            energy_label = tk.Label(self.frame_three,text="Energy (keV)",width=10,bd=3,relief=tk.RIDGE)
+            I_label = tk.Label(self.frame_three,text="Intensity %",width=9,bd=3,relief=tk.RIDGE)
             if i%2==0:
                 energy_label.grid(row=3,column=i,sticky="E")
                 I_label.grid(row=3,column=i+1,sticky="E")
-                
         
         #Row 4
-
-        self.frame_four = tk.Frame(self.master_frame)
+        #Create Frame 4
+        self.frame_four = tk.Frame(self.tori_tab)
         self.frame_four.grid(row=4,column=0,sticky=tk.NW)
         
-        self.canvas = tk.Canvas(self.frame_four,bg='Yellow',width=450)
+        self.canvas = tk.Canvas(self.frame_four,width=439,bd=3,relief=tk.RIDGE) #parent canvas to frame four
         self.canvas.grid(row=0,column=0)
-        self.vsbar = tk.Scrollbar(self.frame_four,orient=tk.VERTICAL, command=self.canvas.yview)
-        self.vsbar.grid(row=0,column=1,sticky=tk.NS)
-        self.canvas.configure(yscrollcommand=self.vsbar.set)
-
-        self.radiations_frame = tk.Frame(self.canvas,bg='Blue',bd=2)
-
-##        for i in range(1, 20):
-##            for j in range(1, 20):
-##                button = tk.Button(self.radiations_frame, padx=7, pady=7, relief=tk.RIDGE,
-##                                   text="[%d, %d]" % (i, j))
-##                button.grid(row=i, column=j, sticky='news')
-
-        self.canvas.create_window((0,0), window=self.radiations_frame, anchor=tk.NW)
-        self.radiations_frame.update_idletasks()
-        self.canvas.configure(scrollregion=self.canvas.bbox(tk.ALL))
-
-##        self.radiations_frame.update_idletasks()
-##        bbox = self.canvas.bbox(tk.ALL)
-##        w, h = bbox[2]-bbox[1], bbox[3]-bbox[1]
-##        dw, dh = int((w/20) * 4), int((h/20) * 4)
-##        self.canvas.configure(scrollregion=bbox, width=dw, height=dh)
-
-
-        #--Binds--------------------------------------------
-        self.search_button.bind("<Button-1>",self.search)
-        self.isotope_input.bind("<Return>",self.search)
-        self.bind_all("<MouseWheel>",self.mouse_scroll)
         
+        self.vsbar = tk.Scrollbar(self.frame_four,orient=tk.VERTICAL, command=self.canvas.yview) #create scroll bar to frame four
+        self.vsbar.grid(row=0,column=1,sticky=tk.NS)
+        self.canvas.configure(yscrollcommand=self.vsbar.set) #configure canvas to respond to scrollbar object
 
+        self.radiations_frame = tk.Frame(self.canvas,bd=3,) #Create frame for radiations to be inserted onto
+        
+        self.canvas.create_window((0,0), window=self.radiations_frame, anchor=tk.NW) #create window with radiations frame
+        self.radiations_frame.update_idletasks() #acquire bbox
+        self.canvas.configure(scrollregion=self.canvas.bbox(tk.ALL)) #congiure the canvas to scroll
+
+#---------Binds---------------------------------------------
+        
+        #TORI TAB
+        self.search_button.bind("<Button-1>",lambda foo: self.search(self,self.isotope_input))
+        self.print_button.bind("<Button-1>",self.print_data)
+        self.isotope_input.bind("<Return>",lambda foo: self.search(self,self.isotope_input))
+        self.bind_all("<MouseWheel>",self.mouse_scroll)
         self.isotope_input.focus_set()
+
+
+#---------Notebook------------------------------------------
+        
+        self.notebook.pack(fill=tk.BOTH,expand=1)
+        
+#---------Functions-----------------------------------------
                                 
-    #function uses to acquire information from user input
+    #function used to acquire information from user input
     #passes input along to acquire radiation data from db
-    def search(self,event=None):
+    def search(self,event=None,isotope_input=None):
         #pull data from user input
-        isotope = self.isotope_input.get(1.0,tk.END).strip('\n')
+        isotope = isotope_input.get(1.0,tk.END).strip('\n')
         test = False
         #Logic to acquire formatting of isotope and separate name from A
         try:
@@ -147,16 +166,19 @@ class Root(tk.Tk):
                     msg.askokcancel("Confirm", "Please enter a nuclide")
                     test = True
             #delete user input
-            self.isotope_input.delete(1.0,tk.END)
+            isotope_input.delete(1.0,tk.END)
             #if no errors with metastable entry, run
             if not test:
                 isotope = isotope[:count]
                 isotope = isotope[0].upper() + isotope[1:]
                 self.translate_isotope(isotope,A)
+                self.isotope_print = isotope+A #add to global variable so that print_data can access for file name
         except IndexError:
             #if a blank is entered, show this error message
             msg.askokcancel("Confirm", "Please enter a nuclide")
 
+    #function used to translate user input to isotope reference number in database
+    #passes reference number onto add_radiation() function
     def translate_isotope(self,isotope=None,A=None):
         #test variable for error checking
         test = False
@@ -185,8 +207,12 @@ class Root(tk.Tk):
                 elif int(A) >= 10 and int(A) <100:
                     A = "0" + A
                 ref = Z + "0" + A
-        self.add_radiation(ref)
+            try:
+                self.add_radiation(ref)
+            except UnboundLocalError:
+                pass
 
+    #add radiations to main screen of all 3 types from isotope
     def add_radiation(self,ref=None):
 
         #clear any existing radiation labels
@@ -216,17 +242,24 @@ class Root(tk.Tk):
         #add radiation energies of gamma rays
         count = 1
         row = 0
-        r_num = int(len(self.gamma_db[ref])/2) #determine number of radiations of each type
+        try:
+            r_num = int(len(self.gamma_db[ref])/2) #determine number of radiations of each type
+        except KeyError:
+            pass
         if r_num!=0:
             for i in range(r_num):
                 new_rad = tk.Label(self.radiations_frame,text=self.gamma_db[ref]['gamma'+str(count)],width=10)
                 new_rad_I = tk.Label(self.radiations_frame,text=self.gamma_db[ref]['I'+str(count)],width=9)
+                
                 new_rad.grid(row=row,column=0)
                 new_rad_I.grid(row=row,column=1)
+                
                 self.y_rads.append(new_rad)
                 self.y_I.append(new_rad_I)
+                
                 row+=1
                 count+=1
+        #if no radiations, add blank spaces to maintain width
         elif r_num ==0:
             new_rad = tk.Label(self.radiations_frame,text="",width=10)
             new_rad_I = tk.Label(self.radiations_frame,text="",width=9)
@@ -238,17 +271,24 @@ class Root(tk.Tk):
         #add radiation energies of beta particles
         count = 1
         row = 0
-        r_num = int(len(self.beta_db[ref])/2) #determine number of radiations of each type
+        try:
+            r_num = int(len(self.beta_db[ref])/2) #determine number of radiations of each type
+        except KeyError:
+            pass
         if r_num!=0:
             for i in range(r_num):
                 new_rad = tk.Label(self.radiations_frame,text=self.beta_db[ref]['beta'+str(count)],width=10)
                 new_rad_I = tk.Label(self.radiations_frame,text=self.beta_db[ref]['I'+str(count)],width=9)
+                
                 new_rad.grid(row=row,column=2)
                 new_rad_I.grid(row=row,column=3)
+                
                 self.b_rads.append(new_rad)
                 self.b_I.append(new_rad_I)
+                
                 row+=1
                 count+=1
+        #if no radiations, add blank spaces to maintain width
         elif r_num == 0:
             new_rad = tk.Label(self.radiations_frame,text="",width=10)
             new_rad_I = tk.Label(self.radiations_frame,text="",width=9)
@@ -260,17 +300,24 @@ class Root(tk.Tk):
         #add radiation energies of alpha particles
         count = 1
         row = 0
-        r_num = int(len(self.alpha_db[ref])/2) #determine number of radiations of each type
+        try:
+            r_num = int(len(self.alpha_db[ref])/2) #determine number of radiations of each type
+        except KeyError:
+            pass
         if r_num != 0:
             for i in range(r_num):
                 new_rad = tk.Label(self.radiations_frame,text=self.alpha_db[ref]['alpha'+str(count)],width=10)
                 new_rad_I = tk.Label(self.radiations_frame,text=self.alpha_db[ref]['I'+str(count)],width=9)
+                
                 new_rad.grid(row=row,column=4)
                 new_rad_I.grid(row=row,column=5)
+                
                 self.a_rads.append(new_rad)
                 self.a_I.append(new_rad_I)
+                
                 row+=1
                 count+=1
+        #if no radiations, add blank spaces to maintain width
         elif r_num == 0:
             new_rad = tk.Label(self.radiations_frame,text="",width=10)
             new_rad_I = tk.Label(self.radiations_frame,text="",width=9)
@@ -279,20 +326,70 @@ class Root(tk.Tk):
             self.a_rads.append(new_rad)
             self.a_I.append(new_rad_I)
 
+        #reconfigure canvas with updated radiations_frame
         self.canvas.create_window((0,0), window=self.radiations_frame, anchor=tk.NW)
         self.radiations_frame.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox(tk.ALL))
 
-    def mouse_scroll(self, event):
-        if event.delta:
-            self.tasks_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-        else:
-            if event.num == 5:
-                move = 1
-            else:
-                move = -1
+    #Print all data
+    def print_data(self,event=None):
+        ytmp = []
+        btmp = []
+        atmp = []
+        for i in range(len(self.y_rads)):
+            new = []
+            new.append(self.y_rads[i].cget("text"))
+            new.append(self.y_I[i].cget("text"))
+            ytmp.append(new)
+        for i in range(len(self.b_rads)):
+            new = []
+            new.append(self.b_rads[i].cget("text"))
+            new.append(self.b_I[i].cget("text"))
+            btmp.append(new)
+        for i in range(len(self.a_rads)):
+            new = []
+            new.append(self.a_rads[i].cget("text"))
+            new.append(self.a_I[i].cget("text"))
+            atmp.append(new)
 
-            self.tasks_canvas.yview_scroll(move, "units")
+        outputlist = []
+        for i in range(max(len(ytmp),len(btmp),len(atmp))):
+            tmp=[]
+            try:
+                if str(ytmp[i][0]) != "":
+                    tmp.append(str(ytmp[i][0]))
+                    tmp.append(str(ytmp[i][1]))
+            except IndexError:
+                pass
+            try:
+                if str(btmp[i][0]) != "":
+                    tmp.append(str(btmp[i][0]))
+                    tmp.append(str(btmp[i][1]))
+            except IndexError:
+                pass
+            try:
+                if str(atmp[i][0]) != "":
+                    tmp.append(str(atmp[i][0]))
+                    tmp.append(str(atmp[i][1]))
+            except IndexError:
+                pass
+            outputlist.append(tmp)
+
+        with open(self.isotope_print+'.txt','w') as f:
+            f.write('Gamma-Rays'+','+''+','+'Beta-Particles'+','+''+','+'Alpha-Particles'+'\n')
+            f.write('Energy(keV)'+','+'Intensity%'+','+'Energy(keV)'+','+'Intensity%'+','+'Energy(keV)'+','+'Intensity%'+'\n')
+            for line in outputlist:
+                for i in range(len(line)):
+                    if i != len(line)-1:
+                        f.write(line[i]+",")
+                    else:
+                        f.write(line[i])
+                f.write('\n')
+                
+    #allow the use of the mouse wheel to scroll
+    def mouse_scroll(self, event):
+        self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+ 
 
 if __name__ == "__main__":
     window = Root()
