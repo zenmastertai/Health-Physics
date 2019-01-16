@@ -19,6 +19,14 @@ class Root(tk.Tk):
 
         with open('alpha.pickle', 'rb') as handle:
             self.alpha_db = pickle.load(handle)
+
+        #this data includes A, Z, name, half-life, and abundance of each isotope attached to each reference
+        with open('parents.pickle', 'rb') as handle:
+            self.parents1 = pickle.load(handle)
+
+        #this data includes the decay mode and branching ratio attached to each reference
+        with open('parents2.pickle', 'rb') as handle:
+            self.parents2 = pickle.load(handle)
             
         self.y_rads = [] #gamma
         self.b_rads = [] #beta
@@ -43,18 +51,14 @@ class Root(tk.Tk):
         self.conversion_tab = tk.Frame(self.notebook)
         self.decay_tab = tk.Frame(self.notebook)
         self.xray_tab = tk.Frame(self.notebook)
-
+        
+        self.notebook.add(self.decay_tab,text='Decay')
         self.notebook.add(self.tori_tab,text='TORI')
         self.notebook.add(self.conversion_tab,text='Conversion')
-        self.notebook.add(self.decay_tab,text='Decay')
         self.notebook.add(self.xray_tab,text='Xrays')
 
 
 #-------TORI TAB--------------------------------------------
-
-##        #Master Frame
-##        self.tori_frame = tk.Frame(self,bg='Light Blue',bd=3,relief=tk.RIDGE)
-##        self.tori_frame.grid(sticky=tk.NSEW)
 
         #Row 0
         #Create Frame 0
@@ -122,14 +126,44 @@ class Root(tk.Tk):
         self.radiations_frame.update_idletasks() #acquire bbox
         self.canvas.configure(scrollregion=self.canvas.bbox(tk.ALL)) #congiure the canvas to scroll
 
-#---------Binds---------------------------------------------
+#-------DECAY TAB--------------------------------------------
+
+        #Row 0
+        #Create Frame 0
+        self.frame_zero = tk.Frame(self.decay_tab,bd=3,relief=tk.RIDGE)
+        self.frame_zero.grid(row=0,column=0,sticky=tk.NSEW)
         
-        #TORI TAB
-        self.search_button.bind("<Button-1>",lambda foo: self.search(self,self.isotope_input))
-        self.print_button.bind("<Button-1>",self.print_data)
-        self.isotope_input.bind("<Return>",lambda foo: self.search(self,self.isotope_input))
+        self.decay_isotope_input_label = tk.Label(self.frame_zero,text="Isotope:")
+        self.decay_isotope_input_label2 = tk.Label(self.frame_zero,text="(Ex: Cs-137, cs137,cesium-137, cesium137)")
+        self.decay_isotope_input = tk.Text(self.frame_zero,height=1,width=20)
+
+        self.decay_isotope_input_label.grid(row=0,column=0,sticky=tk.NSEW)
+        self.decay_isotope_input_label2.grid(row=0,column=2,rowspan=2,sticky=tk.NSEW)
+        self.decay_isotope_input.grid(row=0,column=1,sticky=tk.NSEW)
+
+        #Row 1
+        #Create Frame 1
+        self.frame_one = tk.Frame(self.decay_tab)
+        self.frame_one.grid(row=1,column=0,sticky=tk.NSEW)
+        
+        self.decay_search_button = tk.Button(self.frame_one, text="Search")
+        self.decay_search_button.grid(row=0,column=0,sticky=tk.NSEW)
+
+#---------Binds---------------------------------------------
+
         self.bind_all("<MouseWheel>",self.mouse_scroll)
-        self.isotope_input.focus_set()
+
+        #TORI TAB
+        self.search_button.bind("<Button-1>",lambda foo: self.TORI_search(self,self.isotope_input))
+        self.print_button.bind("<Button-1>",self.print_data)
+        self.isotope_input.bind("<Return>",lambda foo: self.TORI_search(self,self.isotope_input))
+
+
+        #Decay TAB
+        self.decay_search_button.bind("<Button-1>",lambda foo: self.decay_search(self,self.decay_isotope_input))
+        self.decay_isotope_input.bind("<Return>",lambda foo: self.decay_search(self,self.decay_isotope_input))
+
+        self.decay_isotope_input.focus_set()
 
 
 #---------Notebook------------------------------------------
@@ -137,9 +171,115 @@ class Root(tk.Tk):
         self.notebook.pack(fill=tk.BOTH,expand=1)
         
 #---------Functions-----------------------------------------
-                                
+
+    #Function used to translate user input and add radiations to GUI
+    #----------------------------------------------------      
+    def TORI_search(self,event=None,isotope_input=None):
+        isotope,A = self.search(self,isotope_input)
+        ref = self.translate_isotope(isotope,A)
+        self.add_radiation(ref)
+
+    #Function used to translate user input and search decay chain
+    #----------------------------------------------------      
+    def decay_search(self,event=None,isotope_input=None):
+        
+        isotope,parent_A = self.search(self,isotope_input)
+        
+        parent_ref = self.translate_isotope(isotope,parent_A)
+        
+        branch_list = self.decay_mode_get(parent_ref) #returns an array of all decay modes for various branches
+        print(branch_list)
+        for branch in branch_list:
+            print(branch)
+            decay_modes = self.decay_mode_split(branch)
+            new_i,new_A = self.decay_mode_translate(decay_modes,parent_ref,parent_A)
+            print(new_i,new_A)
+
+##        modes=self.decay_mode_split(branch_list[3])
+##        
+##        isotope,A = self.decay_mode_translate(modes[0],parent_ref,A)
+##
+##        daughter_ref = self.translate_isotope(isotope,A)
+##
+##        print(daughter_ref)
+
+        
+    def decay_mode_get(self,ref=None):
+        decay_mode_list=[]
+        for i in range(int(len(self.parents2[ref])/2)):
+            decay_mode_list.append(self.parents2[ref]['mode'+str(i+1)])
+        return decay_mode_list
+
+    def decay_mode_split(self,branch=None):
+        tmp_list = []
+        count = 1
+        while len(branch) > 0:
+            x = branch[:count]
+            try:
+                if branch[:count+1] == 'EC+':
+                    x = branch[:count+3]
+                    tmp_list.append(x)
+                    branch = branch.replace(x,"")
+                    count = 1
+                elif x in decay_types:
+                    tmp_list.append(x)
+                    branch = branch.replace(x,"")
+                    count = 1
+                else:
+                    count+=1
+            except IndexError:
+                pass
+        return tmp_list
+
+    def decay_mode_translate(self,modes=None,ref=None,A=None):
+
+        Z = int(ref.replace(ref[-4:],""))
+        A = int(A)
+
+        for mode in modes:
+            if mode == 'B-':
+                Z = Z + 1
+            elif mode == 'B+':
+                Z = Z - 1
+            elif mode == 'EC':
+                Z = Z - 1
+            elif mode == 'EC+':
+                Z = Z - 1
+            elif mode == 'EC+B+':
+                Z = Z - 1
+            elif mode == 'A' or mode == '2A':
+                Z = Z - 2
+                A = A - 4
+            elif mode == '3A':
+                Z = Z - 4
+                Z = Z - 8
+            elif mode == 'N':
+                A = A - 1
+            elif mode == '2N':
+                A = A - 2
+            elif mode == '3N':
+                A = A - 3
+            elif mode == 'P':
+                Z = Z - 1
+                A = A - 1
+            elif mode == '2P':
+                Z = Z - 2
+                A = A - 2
+            elif mode == 'IT':
+                A = A - 300
+            elif mode == 'D':
+                Z = Z - 1
+                A = A - 1
+            elif mode == 'T':
+                Z = Z - 1
+                A = A - 3
+
+        isotope = nuclides_rev[Z]
+        return isotope,str(A)
+            
     #function used to acquire information from user input
     #passes input along to acquire radiation data from db
+    #----------------------------------------------------
     def search(self,event=None,isotope_input=None):
         #pull data from user input
         isotope = isotope_input.get(1.0,tk.END).strip('\n')
@@ -173,7 +313,7 @@ class Root(tk.Tk):
             if not test:
                 isotope = isotope[:count]
                 isotope = isotope[0].upper() + isotope[1:]
-                self.translate_isotope(isotope,A)
+                return isotope, A
                 self.isotope_print = isotope+A #add to global variable so that print_data can access for file name
         except IndexError:
             #if a blank is entered, show this error message
@@ -181,6 +321,7 @@ class Root(tk.Tk):
 
     #function used to translate user input to isotope reference number in database
     #passes reference number onto add_radiation() function
+    #----------------------------------------------------
     def translate_isotope(self,isotope=None,A=None):
         #test variable for error checking
         test = False
@@ -210,11 +351,26 @@ class Root(tk.Tk):
                     A = "0" + A
                 ref = Z + "0" + A
             try:
-                self.add_radiation(ref)
+                return ref
             except UnboundLocalError:
                 pass
 
+    def translate_reference(self,ref=None):
+        isotope = ref.replace(ref[-4:],"")
+        tmp = ref[-3:]
+
+        if tmp[:2] == '00':
+            A = ref[-1:]
+        elif tmp[:1] == '0':
+            A = ref[-2:]
+        else:
+            A = ref[-3:]
+        
+        return nuclides_rev[int(isotope)],A
+
+
     #add radiations to main screen of all 3 types from isotope
+    #----------------------------------------------------
     def add_radiation(self,ref=None):
 
         #clear any existing radiation labels
@@ -334,7 +490,10 @@ class Root(tk.Tk):
         self.canvas.configure(scrollregion=self.canvas.bbox(tk.ALL))
 
     #Print all data
+    #----------------------------------------------------
     def print_data(self,event=None):
+        
+        #Get data from labels in GUI to temporary lists
         ytmp = []
         btmp = []
         atmp = []
@@ -354,6 +513,8 @@ class Root(tk.Tk):
             new.append(self.a_I[i].cget("text"))
             atmp.append(new)
 
+        #compile all 3 lists into a single two dimensional list
+        #6 columns across, i rows down for largest # of radiations present
         outputlist = []
         for i in range(max(len(ytmp),len(btmp),len(atmp))):
             tmp=[]
@@ -377,6 +538,7 @@ class Root(tk.Tk):
                 pass
             outputlist.append(tmp)
 
+        #print data to a text file
         with open(self.isotope_print+'.txt','w') as f:
             f.write('Gamma-Rays'+','+''+','+'Beta-Particles'+','+''+','+'Alpha-Particles'+'\n')
             f.write('Energy(keV)'+','+'Intensity%'+','+'Energy(keV)'+','+'Intensity%'+','+'Energy(keV)'+','+'Intensity%'+'\n')
@@ -389,8 +551,11 @@ class Root(tk.Tk):
                 f.write('\n')
                 
     #allow the use of the mouse wheel to scroll
+    #----------------------------------------------------
     def mouse_scroll(self, event):
         self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+
+
  
 
 if __name__ == "__main__":
