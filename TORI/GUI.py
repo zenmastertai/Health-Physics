@@ -42,10 +42,12 @@ class Root(tk.Tk):
         self.tori_tab = tk.Frame(self.notebook)
         self.conversion_tab = tk.Frame(self.notebook)
         self.decay_tab = tk.Frame(self.notebook)
+        self.xray_tab = tk.Frame(self.notebook)
 
         self.notebook.add(self.tori_tab,text='TORI')
         self.notebook.add(self.conversion_tab,text='Conversion')
         self.notebook.add(self.decay_tab,text='Decay')
+        self.notebook.add(self.xray_tab,text='Xrays')
 
 
 #-------TORI TAB--------------------------------------------
