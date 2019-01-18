@@ -1,18 +1,33 @@
-def sum_keys(d):
-    if not isinstance(d,dict):
-        return 0
-    else:
-        return len(d) + sum(sum_keys(v) for v in d.items())
+from collections import defaultdict
 
-#https://stackoverflow.com/questions/35427814/get-the-number-of-all-keys-in-a-dictionary-of-dictionaries-in-python
-#https://stackoverflow.com/questions/20444340/iter-values-item-in-dictionary-does-not-work
+def sum_keys(d):
+    for k,v in d.items():
+        print(k)
+                   
+        sum_keys(v)
+
+    
+##        return len(d) + sum(sum_keys(v) for v in d.items())
+
     
 
 decay_chain={}
 
-decay_chain['K-40']={"Ar-40":{"He-4":{"H-2":{}}},"Ca-40":{"Mg-20":{"Al-22":{}}}}
+decay_chain['K-40']={"Ar-40":{"He-4":{"H-2":{}}},
+                     "Ca-40":{"Mg-20":{"Al-22":{}}},
+                    }
 
-print(sum_keys(decay_chain))
+#https://stackoverflow.com/questions/27118687/updating-nested-dictionaries-when-data-has-existing-key/27118776
+
+print(my_dict)
+#sum_keys(decay_chain)
+
+##for k,v in decay_chain.items():
+##    print(k)
+##    for i,j in v.items():
+##        print(i)
+##        print(j)
+
 
 ##for p_id, p_info in decay_chain.items():
 ##    print("\nPerson ID:", p_id)

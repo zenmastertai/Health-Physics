@@ -184,44 +184,64 @@ class Root(tk.Tk):
     def decay_search(self,event=None,isotope_input=None):
         
         isotope,parent_A = self.search(self,isotope_input)
+        parent_isotope = isotope+'-'+parent_A
+        self.dc = {}
+        self.dc[parent_isotope]={}
 
-        decay_chain = {}
+        self.gen_list = [[parent_isotope]]
+        self.decay_chain_get(1)
+        for line in self.gen_list:
+            print(line)
 
-        decay_chain[isotope+"-"+parent_A]={"Ar-40":{"He-4":{}},"Ca-40":{}}
-
-        for p_id, p_info in decay_chain.items():
-            print("\nPerson ID:", p_id)
+    def decay_chain_get(self,gen_num):
+        x = 1
+        for g in self.gen_list:
+            if x == gen_num:
+                generation = g
+            else:
+                x+=1
             
-            for key in p_info:
-                print(key + ':', p_info[key])
+        tmp = []
+
+        for iso in generation:
+            for i in range(len(iso)):
+                if iso[i] == '-':
+                    isotope = iso[0:i]
+                    A = iso.replace(isotope+'-',"")
+                    break
+            
+            ref = self.translate_isotope(isotope,A) #get referenc id for isotope
+            branch_list = self.decay_mode_get(ref) #get all branching ratios in a list for that isotope
+            if len(branch_list)>0:
+                for branch in branch_list: #loop through all branching ratios
+                    decay_modes = self.decay_mode_split(branch) #split all decay modes up into a list in order for single branch
+                    new_i,new_A = self.decay_mode_translate(decay_modes,ref,A) #calculate daughter from parent for each branch
+                    new_isotope = new_i+'-'+new_A
+                    self.save_decay_chain(isotope,new_isotope)
+                    tmp.append(new_isotope)
+        if len(tmp)>0:
+            self.gen_list.append(tmp)
+            self.decay_chain_get(x+1)
+
+    #k = each element in that level
+    #v = each dictionary of each subsequent element in that level
+    def save_decay_chain(self,isotope=None,new_isotope=None,k=None,v=None):
+        generation_list = self.gen_list[len(self.gen_list)-1]
+        for k,v in self.dc.items():
+            if k == isotope:
+                self.
+            
+            
 
 
-        
-        parent_ref = self.translate_isotope(isotope,parent_A)
-        
-        branch_list = self.decay_mode_get(parent_ref) #returns an array of all decay modes for various branches
-
-        
-        
-        for branch in branch_list:
-            #print(branch)
-            decay_modes = self.decay_mode_split(branch)
-            new_i,new_A = self.decay_mode_translate(decay_modes,parent_ref,parent_A)
-            #print(new_i,new_A)
-
-##        modes=self.decay_mode_split(branch_list[3])
-##        
-##        isotope,A = self.decay_mode_translate(modes[0],parent_ref,A)
-##
-##        daughter_ref = self.translate_isotope(isotope,A)
-##
-##        print(daughter_ref)
-
-        
+    
     def decay_mode_get(self,ref=None):
         decay_mode_list=[]
-        for i in range(int(len(self.parents2[ref])/2)):
-            decay_mode_list.append(self.parents2[ref]['mode'+str(i+1)])
+        try:
+            for i in range(int(len(self.parents2[ref])/2)):
+                decay_mode_list.append(self.parents2[ref]['mode'+str(i+1)])
+        except KeyError:
+            pass
         return decay_mode_list
 
     def decay_mode_split(self,branch=None):
@@ -348,7 +368,7 @@ class Root(tk.Tk):
                 Z = nuclides_long[isotope]
             except KeyError:
                 #if not in the second, user entered invalid isotope
-                msg.askokcancel("Error", "Valid Nuclide Not Entered")
+                msg.askokcancel("Error", "Valid Nuclide Not Entered:" +isotope)
                 test = True
         #test to see if a metastable isotope was entered
         if not test:
