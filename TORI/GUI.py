@@ -184,16 +184,30 @@ class Root(tk.Tk):
     def decay_search(self,event=None,isotope_input=None):
         
         isotope,parent_A = self.search(self,isotope_input)
+
+        decay_chain = {}
+
+        decay_chain[isotope+"-"+parent_A]={"Ar-40":{"He-4":{}},"Ca-40":{}}
+
+        for p_id, p_info in decay_chain.items():
+            print("\nPerson ID:", p_id)
+            
+            for key in p_info:
+                print(key + ':', p_info[key])
+
+
         
         parent_ref = self.translate_isotope(isotope,parent_A)
         
         branch_list = self.decay_mode_get(parent_ref) #returns an array of all decay modes for various branches
-        print(branch_list)
+
+        
+        
         for branch in branch_list:
-            print(branch)
+            #print(branch)
             decay_modes = self.decay_mode_split(branch)
             new_i,new_A = self.decay_mode_translate(decay_modes,parent_ref,parent_A)
-            print(new_i,new_A)
+            #print(new_i,new_A)
 
 ##        modes=self.decay_mode_split(branch_list[3])
 ##        
