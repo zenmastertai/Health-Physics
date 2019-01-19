@@ -6,8 +6,13 @@ def sum_keys(d):
                    
         sum_keys(v)
 
-    
-##        return len(d) + sum(sum_keys(v) for v in d.items())
+def update(d, u):
+    for k, v in u.items():
+        if isinstance(v, collections.Mapping):
+            d[k] = update(d.get(k, {}), v)
+        else:
+            d[k] = v
+    return d
 
     
 
@@ -17,8 +22,38 @@ decay_chain['K-40']={"Ar-40":{"He-4":{"H-2":{}}},
                      "Ca-40":{"Mg-20":{"Al-22":{}}},
                     }
 
+
+
+
+
+
+##decay_chain = lambda: defaultdict(decay_chain)
+##mydict = decay_chain()
+##mydict = mydict['K-40'] = {"Ar-40":{"He-4":{"H-2":{}}},
+##                     "Ca-40":{"Mg-20":{"Al-22":{}}},
+##                    }
+##print(mydict)
+##for line in mydict:
+##    path = line.split('/')
+##    print(line)
+##    for i in range(len(path)-1):
+##        print(mydict[path[i]])
+##        print(i)
+
+
+##    if path[-1] != '':
+##        d = mydict
+##
+##        for i in range(len(path) -1):
+##            d = d[path[i]]
+##        d[path[-1]] = 'file'
+
+
+
+
+
 #https://stackoverflow.com/questions/37357976/best-practice-to-recursively-update-a-nested-dictionary
-print(my_dict)
+
 #sum_keys(decay_chain)
 
 ##for k,v in decay_chain.items():
