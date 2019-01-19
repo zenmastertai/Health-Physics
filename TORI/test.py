@@ -5,25 +5,34 @@ def sum_keys(d):
         print(v)     
         sum_keys(v)
 
-def get_nested(data, k):
-    if k and data:
-        element  = k[0]
-        if element:
-            value = data.get(element)
-            return value if len(k) == 1 else get_nested(value, k[1:])
+def set(d, key, value):
+    dd = d
+    keys = key.split('.')
+    latest = keys.pop()
+    for k in keys:
+        dd = dd.setdefault(k, {})
+    dd.setdefault(latest, value)
 
 decay_chain={}
 
-decay_chain['K-40']={"Ar-40":{"He-4":{"H-2":{}}},
+decay_chain['K-40']={"Ar-40":{"He-4":{"H-2":{}},"Ls-65":{"Kc-45":{}}},
                      "Ca-40":{"Mg-20":{"Al-22":{}}},
                     }
-k = ["K-40","Ar-40"]
-print(get_nested(decay_chain,k))
-print(decay_chain[k])
+
+set(decay_chain,'K-40.Ar-40.He-4.H-2.As-40',{})
+set(decay_chain,'K-40.Ca-40.Mg-20.Al-22.Pb-82',{})
+print(decay_chain)
+sum_keys(decay_chain)
+
+
 
 ##sum_keys(decay_chain)
 
-
+{'K-40':
+ {'Ar-40':
+  {'He-4': {'H-2': {'As-40': {}}},
+   'Ls-65': {'Kc-45': {}}},
+  'Ca-40': {'Mg-20': {'Al-22': {'Pb-82': {}}}}}}
 
 ##decay_chain = lambda: defaultdict(decay_chain)
 ##mydict = decay_chain()
