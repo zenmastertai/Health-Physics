@@ -195,6 +195,7 @@ class Root(tk.Tk):
 
     def decay_chain_get(self,gen_num):
         x = 1
+        #cycle through each generation to determine which generation is the current one
         for g in self.gen_list:
             if x == gen_num:
                 generation = g
@@ -203,7 +204,10 @@ class Root(tk.Tk):
             
         tmp = []
 
+        #for every isotope in the current generation,
+        #calculate each daughter product
         for iso in generation:
+            #break down isotope into isotope and A components
             for i in range(len(iso)):
                 if iso[i] == '-':
                     isotope = iso[0:i]
@@ -211,25 +215,31 @@ class Root(tk.Tk):
                     break
             
             ref = self.translate_isotope(isotope,A) #get referenc id for isotope
+            
             branch_list = self.decay_mode_get(ref) #get all branching ratios in a list for that isotope
+
+            #if the isotope isn't stable, caclulate daughter
             if len(branch_list)>0:
                 for branch in branch_list: #loop through all branching ratios
                     decay_modes = self.decay_mode_split(branch) #split all decay modes up into a list in order for single branch
                     new_i,new_A = self.decay_mode_translate(decay_modes,ref,A) #calculate daughter from parent for each branch
                     new_isotope = new_i+'-'+new_A
-                    self.save_decay_chain(isotope,new_isotope)
+
+
+
                     tmp.append(new_isotope)
+        #if the branch ends, stop recursion
+        #if the branch keeps going, go deeper
         if len(tmp)>0:
             self.gen_list.append(tmp)
             self.decay_chain_get(x+1)
 
-    #k = each element in that level
-    #v = each dictionary of each subsequent element in that level
-    def save_decay_chain(self,isotope=None,new_isotope=None,k=None,v=None):
-        generation_list = self.gen_list[len(self.gen_list)-1]
-        for k,v in self.dc.items():
-            if k == isotope:
-                self.
+    def set(key, value):
+        keys = key.split('.')
+        latest = keys.pop()
+        for k in keys:
+            self.dc = self.dc.setdefault(k, {})
+        self.dc.setdefault(latest, value)
             
             
 
