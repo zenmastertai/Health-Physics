@@ -1,29 +1,27 @@
-from collections import *
+from collections import abc
 
 def sum_keys(d):
     for k,v in d.items():
-        print(k)
-                   
+        print(v)     
         sum_keys(v)
 
-def update(d, u):
-    for k, v in u.items():
-        if isinstance(v, collections.Mapping):
-            d[k] = update(d.get(k, {}), v)
-        else:
-            d[k] = v
-    return d
-
-    
+def get_nested(data, k):
+    if k and data:
+        element  = k[0]
+        if element:
+            value = data.get(element)
+            return value if len(k) == 1 else get_nested(value, k[1:])
 
 decay_chain={}
 
 decay_chain['K-40']={"Ar-40":{"He-4":{"H-2":{}}},
                      "Ca-40":{"Mg-20":{"Al-22":{}}},
                     }
+k = ["K-40","Ar-40"]
+print(get_nested(decay_chain,k))
+print(decay_chain[k])
 
-
-
+##sum_keys(decay_chain)
 
 
 
@@ -54,7 +52,7 @@ decay_chain['K-40']={"Ar-40":{"He-4":{"H-2":{}}},
 
 #https://stackoverflow.com/questions/37357976/best-practice-to-recursively-update-a-nested-dictionary
 
-#sum_keys(decay_chain)
+
 
 ##for k,v in decay_chain.items():
 ##    print(k)
