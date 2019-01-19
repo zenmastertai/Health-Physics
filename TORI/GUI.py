@@ -186,9 +186,9 @@ class Root(tk.Tk):
         isotope,parent_A = self.search(self,isotope_input)
         parent_isotope = isotope+'-'+parent_A
         self.dc = {}
-        self.dc[parent_isotope]={}
 
         self.gen_list = [[parent_isotope]]
+        self.dc_list = []
         self.decay_chain_get(1)
         for line in self.gen_list:
             print(line)
@@ -217,16 +217,14 @@ class Root(tk.Tk):
             ref = self.translate_isotope(isotope,A) #get referenc id for isotope
             
             branch_list = self.decay_mode_get(ref) #get all branching ratios in a list for that isotope
-
+            
             #if the isotope isn't stable, caclulate daughter
             if len(branch_list)>0:
                 for branch in branch_list: #loop through all branching ratios
                     decay_modes = self.decay_mode_split(branch) #split all decay modes up into a list in order for single branch
                     new_i,new_A = self.decay_mode_translate(decay_modes,ref,A) #calculate daughter from parent for each branch
                     new_isotope = new_i+'-'+new_A
-
-
-
+                    
                     tmp.append(new_isotope)
         #if the branch ends, stop recursion
         #if the branch keeps going, go deeper
@@ -240,10 +238,6 @@ class Root(tk.Tk):
         for k in keys:
             self.dc = self.dc.setdefault(k, {})
         self.dc.setdefault(latest, value)
-            
-            
-
-
     
     def decay_mode_get(self,ref=None):
         decay_mode_list=[]
