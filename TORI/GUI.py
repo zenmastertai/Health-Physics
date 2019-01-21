@@ -201,11 +201,8 @@ class Root(tk.Tk):
         self.frame_three = tk.Frame(self.conversion_tab, bd=3, relief=tk.RIDGE)
         self.frame_three.grid(row=3, column=0, sticky=tk.NSEW)
 
-        self.end_entry = tk.Text(self.frame_three, height=1, width=20)
         self.end_entry_label = tk.Label(self.frame_three, text="End Value:")
 
-        self.end_entry_label.grid(row=0, column=0,sticky=tk.NSEW)
-        self.end_entry.grid(row=0, column=1, sticky=tk.NSEW)
 
 
 # # -------DECAY TAB--------------------------------------------
@@ -258,7 +255,45 @@ class Root(tk.Tk):
 # ---------Functions-----------------------------------------
 
     def calculate_conversion(self, event=None):
-        print(self.start_var.get())
+        units = ['curies', 'millicuries', 'microcuries', 'nanocuries',
+                 'bq', 'kbq', 'mbq', 'gbq', 'tbq']
+        conv_list = [[1E0, 1E3, 1E6, 1E9, 3.7E10, 3.7E7, 3.7E4, 3.7E1, 3.7E-2],
+                     [1E-3, 1E0, 1E3, 1E6, 3.7E7, 3.7E4, 3.7E1, 3.7E-2, 3.7E-5],
+                     [1E-6, 1e-3, 1e0, 1e3, 3.7e4, 3.7e1, 3.7e-2, 3.7e-5, 3.7e-8],
+                     [1e-9, 1e-6, 1e-3, 1, 3.7e1, 3.7e-2, 3.7e-5, 3.7e-8, 3.7e-11],
+                     [2.7e-11, 2.7e-8, 2.7e-5, 2.7e-2, 1, 1e-3, 1e-6, 1e-9, 1e-12],
+                     [2.7e-8, 2.7e-5, 2.7e-2, 2.7e1, 1e3, 1, 1e-3, 1e-6, 1e-9],
+                     [2.7e-5, 2.7e-2, 2.7e1, 2.7e4, 1e6, 1e3, 1, 1e-3, 1e-6],
+                     [2.7e-2, 2.7e1, 2.7e4, 2.7e7, 1e9, 1e6, 1e3, 1, 1e-3],
+                     [2.7e1, 2.7e4, 2.7e7, 2.7e10, 1e12, 1e9, 1e6, 1e3, 1],
+                     ]
+
+        start_unit = self.start_var.get()
+        end_unit = self.end_var.get()
+
+        val = int(self.start_entry.get(1.0, tk.END).strip('\n'))
+
+        unit_num_start = units.index(start_unit)
+        unit_num_end = units.index(end_unit)
+
+        conversion = conv_list[unit_num_start][unit_num_end]
+        val = val * conversion
+        print(val)
+
+
+        # ci_list = [1E0, 1E3, 1E6, 1E9, 3.7E10, 3.7E7, 3.7E4, 3.7E1, 3.7E-2]
+        # mci_list = [1E-3, 1E0, 1E3, 1E6, 3.7E7, 3.7E4, 3.7E1, 3.7E-2, 3.7E-5]
+        # uci_list = [1E-6, 1e-3, 1e0, 1e3, 3.7e4, 3.7e1, 3.7e-2, 3.7e-5, 3.7e-8]
+        # nci_list = [1e-9, 1e-6, 1e-3, 1, 3.7e1, 3.7e-2, 3.7e-5, 3.7e-8, 3.7e-11]
+        # bq_list = [2.7e-11, 2.7e-8, 2.7e-5, 2.7e-2, 1, 1e-3, 1e-6, 1e-9, 1e-12]
+        # kbq_list = [2.7e-8, 2.7e-5, 2.7e-2, 2.7e1, 1e3, 1, 1e-3, 1e-6, 1e-9]
+        # mbq_list = [2.7e-5, 2.7e-2, 2.7e1, 2.7e4, 1e6, 1e3, 1, 1e-3, 1e-6]
+        # gbq_list = [2.7e-2, 2.7e1, 2.7e4, 2.7e7, 1e9, 1e6, 1e3, 1, 1e-3]
+        # tbq_list = [2.7e1, 2.7e4, 2.7e7, 2.7e10, 1e12, 1e9, 1e6, 1e3, 1]
+
+
+
+
 
     # Function used to translate user input and add radiations to GUI
     # ----------------------------------------------------
