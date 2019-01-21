@@ -202,6 +202,7 @@ class Root(tk.Tk):
         self.frame_three.grid(row=3, column=0, sticky=tk.NSEW)
 
         self.end_entry_label = tk.Label(self.frame_three, text="End Value:")
+        self.end_entry_label.grid(row=0,column=0)
 
 
 
@@ -278,7 +279,8 @@ class Root(tk.Tk):
 
         conversion = conv_list[unit_num_start][unit_num_end]
         val = val * conversion
-        print(val)
+        self.new_value = tk.Label(self.frame_three, text=str(val), width=10)
+        self.new_value.grid(row=0, column=1)
 
 
         # ci_list = [1E0, 1E3, 1E6, 1E9, 3.7E10, 3.7E7, 3.7E4, 3.7E1, 3.7E-2]
