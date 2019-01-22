@@ -3,6 +3,8 @@ import tkinter as tk
 import tkinter.messagebox as msg
 from tkinter.ttk import Notebook
 from isoref import *
+import datetime as dt
+import math
 
 
 class Root(tk.Tk):
@@ -36,6 +38,10 @@ class Root(tk.Tk):
         self.y_I = []  # gamma intensity
         self.b_I = []  # beta intensity
         self.a_I = []  # alpha intensity
+
+        self.iso = []
+        self.hl = []
+        self.act = []
             
         self.title("Table of Radioactive Isotopes Lookup")
         self.geometry("470x370")
@@ -50,10 +56,12 @@ class Root(tk.Tk):
         
         self.tori_tab = tk.Frame(self.notebook)
         self.conversion_tab = tk.Frame(self.notebook)
+        self.decay_tab = tk.Frame(self.notebook)
         self.xray_tab = tk.Frame(self.notebook)
 
-        self.notebook.add(self.conversion_tab, text='Conversion')
         self.notebook.add(self.tori_tab, text='TORI')
+        self.notebook.add(self.decay_tab, text='Decay')
+        self.notebook.add(self.conversion_tab, text='Conversion')
 
         self.notebook.add(self.xray_tab, text='X-rays')
 
@@ -135,27 +143,27 @@ class Root(tk.Tk):
         self.frame_zero = tk.Frame(self.conversion_tab, bd=3, relief=tk.RIDGE)
         self.frame_zero.grid(row=0, column=0, sticky=tk.NSEW)
 
-        self.curies_start = tk.Radiobutton(self.frame_zero, text='curies', variable=self.start_var, value='curies')
-        self.millicuries_start = tk.Radiobutton(self.frame_zero, text='millicuries', variable=self.start_var, value='millicuries')
-        self.microcuries_start = tk.Radiobutton(self.frame_zero, text='microcuries', variable=self.start_var, value='microcuries')
-        self.nanocuries_start = tk.Radiobutton(self.frame_zero, text='nanocuries', variable=self.start_var, value='nanocuries')
-        self.bq_start = tk.Radiobutton(self.frame_zero, text='Bq', variable=self.start_var, value='bq')
-        self.kbq_start = tk.Radiobutton(self.frame_zero, text='KBq', variable=self.start_var, value='kbq')
-        self.mbq_start = tk.Radiobutton(self.frame_zero, text='MBq', variable=self.start_var, value='mbq')
-        self.gbq_start = tk.Radiobutton(self.frame_zero, text='GBq', variable=self.start_var, value='gbq')
-        self.tbq_start = tk.Radiobutton(self.frame_zero, text='TBq', variable=self.start_var, value='tbq')
+        self.curies_start = tk.Radiobutton(self.frame_zero, text='curies', variable=self.start_var, value='curies',tristatevalue=0)
+        self.millicuries_start = tk.Radiobutton(self.frame_zero, text='millicuries', variable=self.start_var, value='millicuries',tristatevalue=0)
+        self.microcuries_start = tk.Radiobutton(self.frame_zero, text='microcuries', variable=self.start_var, value='microcuries',tristatevalue=0)
+        self.nanocuries_start = tk.Radiobutton(self.frame_zero, text='nanocuries', variable=self.start_var, value='nanocuries',tristatevalue=0)
+        self.bq_start = tk.Radiobutton(self.frame_zero, text='Bq', variable=self.start_var, value='bq',tristatevalue=0)
+        self.kbq_start = tk.Radiobutton(self.frame_zero, text='KBq', variable=self.start_var, value='kbq',tristatevalue=0)
+        self.mbq_start = tk.Radiobutton(self.frame_zero, text='MBq', variable=self.start_var, value='mbq',tristatevalue=0)
+        self.gbq_start = tk.Radiobutton(self.frame_zero, text='GBq', variable=self.start_var, value='gbq',tristatevalue=0)
+        self.tbq_start = tk.Radiobutton(self.frame_zero, text='TBq', variable=self.start_var, value='tbq',tristatevalue=0)
 
         self.buffer = tk.Label(self.frame_zero, text="TO", padx=35)
 
-        self.curies_end = tk.Radiobutton(self.frame_zero, text='curies', variable=self.end_var, value='curies')
-        self.millicuries_end = tk.Radiobutton(self.frame_zero, text='millicuries', variable=self.end_var, value='millicuries')
-        self.microcuries_end = tk.Radiobutton(self.frame_zero, text='microcuries', variable=self.end_var, value='microcuries')
-        self.nanocuries_end = tk.Radiobutton(self.frame_zero, text='nanocuries', variable=self.end_var, value='nanocuries')
-        self.bq_end = tk.Radiobutton(self.frame_zero, text='Bq', variable=self.end_var, value='bq')
-        self.kbq_end = tk.Radiobutton(self.frame_zero, text='KBq', variable=self.end_var, value='kbq')
-        self.mbq_end = tk.Radiobutton(self.frame_zero, text='MBq', variable=self.end_var, value='mbq')
-        self.gbq_end = tk.Radiobutton(self.frame_zero, text='GBq', variable=self.end_var, value='gbq')
-        self.tbq_end = tk.Radiobutton(self.frame_zero, text='TBq', variable=self.end_var, value='tbq')
+        self.curies_end = tk.Radiobutton(self.frame_zero, text='curies', variable=self.end_var, value='curies',tristatevalue=0)
+        self.millicuries_end = tk.Radiobutton(self.frame_zero, text='millicuries', variable=self.end_var, value='millicuries',tristatevalue=0)
+        self.microcuries_end = tk.Radiobutton(self.frame_zero, text='microcuries', variable=self.end_var, value='microcuries',tristatevalue=0)
+        self.nanocuries_end = tk.Radiobutton(self.frame_zero, text='nanocuries', variable=self.end_var, value='nanocuries',tristatevalue=0)
+        self.bq_end = tk.Radiobutton(self.frame_zero, text='Bq', variable=self.end_var, value='bq',tristatevalue=0)
+        self.kbq_end = tk.Radiobutton(self.frame_zero, text='KBq', variable=self.end_var, value='kbq',tristatevalue=0)
+        self.mbq_end = tk.Radiobutton(self.frame_zero, text='MBq', variable=self.end_var, value='mbq',tristatevalue=0)
+        self.gbq_end = tk.Radiobutton(self.frame_zero, text='GBq', variable=self.end_var, value='gbq',tristatevalue=0)
+        self.tbq_end = tk.Radiobutton(self.frame_zero, text='TBq', variable=self.end_var, value='tbq',tristatevalue=0)
 
         self.curies_start.grid(row=0, column=0, sticky=tk.W)
         self.millicuries_start.grid(row=1, column=0, sticky=tk.W)
@@ -204,32 +212,83 @@ class Root(tk.Tk):
         self.end_entry_label = tk.Label(self.frame_three, text="End Value:")
         self.end_entry_label.grid(row=0,column=0)
 
+# -------DECAY TAB--------------------------------------------
 
+        # Row 0
+        self.frame_zero = tk.Frame(self.decay_tab, bd=3, relief=tk.RIDGE)
+        self.frame_zero.grid(row=0, column=0, sticky=tk.NSEW)
+        
+        self.iso_input_label = tk.Label(self.frame_zero, text="Isotope:")
+        self.iso_input_label2 = tk.Label(self.frame_zero, text="(Ex: Cs-137, cs137,cesium-137, cesium137)")
+        self.iso_input = tk.Text(self.frame_zero, height=1, width=20)
 
-# # -------DECAY TAB--------------------------------------------
-#
-#         #Row 0
-#         #Create Frame 0
-#         self.frame_zero = tk.Frame(self.decay_tab,bd=3,relief=tk.RIDGE)
-#         self.frame_zero.grid(row=0,column=0,sticky=tk.NSEW)
-#
-#         self.decay_isotope_input_label = tk.Label(self.frame_zero,text="Isotope:")
-#         self.decay_isotope_input_label2 = tk.Label(self.frame_zero,text="(Ex: Cs-137, cs137,cesium-137, cesium137)")
-#         self.decay_isotope_input = tk.Text(self.frame_zero,height=1,width=20)
-#
-#         self.decay_isotope_input_label.grid(row=0,column=0,sticky=tk.NSEW)
-#         self.decay_isotope_input_label2.grid(row=0,column=2,rowspan=2,sticky=tk.NSEW)
-#         self.decay_isotope_input.grid(row=0,column=1,sticky=tk.NSEW)
-#
-#         #Row 1
-#         #Create Frame 1
-#         self.frame_one = tk.Frame(self.decay_tab)
-#         self.frame_one.grid(row=1,column=0,sticky=tk.NSEW)
-#
-#         self.decay_search_button = tk.Button(self.frame_one, text="Search")
-#         self.decay_search_button.grid(row=0,column=0,sticky=tk.NSEW)
+        self.iso_input_label.grid(row=0, column=0, sticky=tk.NSEW)
+        self.iso_input_label2.grid(row=0, column=2, rowspan=2, sticky=tk.NSEW)
+        self.iso_input.grid(row=0, column=1, sticky=tk.NSEW)
 
+        option_list = ('cpm','dpm','pCi','nCi','uCi','mCi','Ci',
+                       'Bq','kBq','MBq','GBq','TBq')
+        self.v = tk.StringVar()
+        self.v.set(option_list[0])
 
+        # Row 1
+        self.frame_one = tk.Frame(self.decay_tab, bd=3, relief=tk.RIDGE)
+        self.frame_one.grid(row=1, column=0, sticky=tk.NSEW)
+
+        self.orig_act = tk.Label(self.frame_one, text="Enter Original Activity:")
+        self.orig_act_input = tk.Text(self.frame_one, height=1, width=20)
+        self.dropdown = tk.OptionMenu(self.frame_one, self.v, *option_list)
+        self.decay_button = tk.Button(self.frame_one, text="Calculate")
+
+        self.orig_act.grid(row=0, column=0)
+        self.orig_act_input.grid(row=0, column=1)
+        self.dropdown.grid(row=0, column=2)
+        self.decay_button.grid(row=0, column=3, sticky=tk.NSEW)
+
+        # Row 2
+        self.frame_two = tk.Frame(self.decay_tab, bd=3, relief=tk.RIDGE)
+        self.frame_two.grid(row=2, column=0, sticky=tk.NSEW)
+
+        self.start_date_label = tk.Label(self.frame_two, text="Enter Original Date(MM/DD/YYYY):")
+        self.start_date_input = tk.Text(self.frame_two, height=1, width=20)
+
+        self.start_date_label.grid(row=0, column=0)
+        self.start_date_input.grid(row=0, column=1)
+
+        # Row 3
+        self.frame_three = tk.Frame(self.decay_tab, bd=3, relief=tk.RIDGE)
+        self.frame_three.grid(row=3, column=0, sticky=tk.NSEW)
+
+        self.end_date_label = tk.Label(self.frame_three, text="Enter End Date (MM/DD/YYYY):")
+        self.end_date_input = tk.Text(self.frame_three, height=1, width=20)
+        
+        self.end_date_label.grid(row=0, column=0)
+        self.end_date_input.grid(row=0, column=1)
+
+        # Row 4
+        self.frame_four = tk.Frame(self.decay_tab, bd=3, relief=tk.RIDGE)
+        self.frame_four.grid(row=4, column=0, sticky=tk.NSEW)
+
+        self.iso_label = tk.Label(self.frame_four, text="Isotope:")
+        
+        self.iso_label.grid(row=0, column=0)
+
+        # Row 5
+        self.frame_five = tk.Frame(self.decay_tab, bd=3, relief=tk.RIDGE)
+        self.frame_five.grid(row=5, column=0, sticky=tk.NSEW)
+
+        self.half_life_label = tk.Label(self.frame_five, text="Half-life:")
+        
+        self.half_life_label.grid(row=0, column=0)
+
+        # Row 6
+        self.frame_six = tk.Frame(self.decay_tab, bd=3, relief=tk.RIDGE)
+        self.frame_six.grid(row=6, column=0, sticky=tk.NSEW)
+
+        self.end_act_label = tk.Label(self.frame_six, text="Decayed Activity:")
+        
+        self.end_act_label.grid(row=0, column=0)
+        
 #---------Binds---------------------------------------------
 
         self.bind_all("<MouseWheel>", self.mouse_scroll)
@@ -242,11 +301,8 @@ class Root(tk.Tk):
         # CONVERSION TAB
         self.calc_conv_button.bind("<Button-1>", self.calculate_conversion)
 
-        # #Decay TAB
-        # self.decay_search_button.bind("<Button-1>",lambda foo: self.decay_search(self,self.decay_isotope_input))
-        # self.decay_isotope_input.bind("<Return>",lambda foo: self.decay_search(self,self.decay_isotope_input))
-        #
-        # self.decay_isotope_input.focus_set()
+        # DECAY TAB
+        self.decay_button.bind("<Button-1>", self.calculate_decay)
 
 
 # ---------Notebook------------------------------------------
@@ -255,6 +311,98 @@ class Root(tk.Tk):
         
 # ---------Functions-----------------------------------------
 
+    # Function used to calculate decay from start to end date with original activity
+    # ----------------------------------------------------   
+    def calculate_decay(self, event=None):
+        unit_list = ['ns', 'us', 'ms', 's', 'm', 'd', 'y']
+        unit_conv_list = [1.16e-14, 1.16e-11, 1.15e-8, 1.16e-5, 6.94e-4, 1, 365]
+
+        # Get activity input
+        try:
+            act = float(self.orig_act_input.get(1.0, tk.END).strip('\n'))
+            test = False
+        except ValueError:
+            msg.askokcancel("Confirm", "Please enter a valid activity")
+
+        #return time in days
+        t = self.get_time(self,self.start_date_input,self.end_date_input)
+
+        #translate isotope input
+        isotope,A = self.search(self, self.iso_input)
+        ref = self.translate_isotope(isotope, A)
+
+
+        #delete any isotope values on screen and put new value on screen
+        for i in self.iso:
+            i.destroy()
+        self.iso = []
+        iso = tk.Label(self.frame_four,text=isotope+"-"+A)
+        iso.grid(row=0, column=1)
+        self.iso.append(iso)
+
+        #acquire half-life of isotope input
+        halflife = self.parents1[ref]['halflife']
+
+        #delete any halflife values on screen and put new value on screen
+        for h in self.hl:
+            h.destroy()
+        self.hl = []
+        half_life_label = tk.Label(self.frame_five,text=halflife)
+        half_life_label.grid(row=0, column=1)
+        self.hl.append(half_life_label)
+
+        #split up num value and unit value of halflife
+        for j in range(len(unit_list)):
+            if unit_list[j] in halflife:
+                halflife = halflife.replace(unit_list[j],"")
+                hl_unit = unit_list[j]
+                break
+
+        #convert halflife unit to days and convert to decay constant
+        halflife = float(halflife)*unit_conv_list[unit_list.index(hl_unit)]
+        decay_constant = 0.693/halflife #d^-1
+
+        #calculate decay factor and new activity after t passed
+
+        try:
+            decay_factor = math.exp(-decay_constant*t)
+            new_act = decay_factor * act
+
+            #delete any activity values ons creen and put new value on screen
+            for a in self.act:
+                a.destroy()
+            self.act = []
+            new_act_label = tk.Label(self.frame_six,text='{:.2e}'.format(new_act))
+            new_act_label.grid(row=0, column=1)
+            self.act.append(new_act_label)
+        except (UnboundLocalError, TypeError):
+            pass
+
+    # Function used to calculate time difference between start and end date
+    # ----------------------------------------------------    
+    def get_time(self, event=None, start=None, end=None):
+        #acquire start and end date, take the difference, return time passed
+        try:
+            start_date = start.get(1.0, tk.END).strip('\n')
+            start_date = start_date.split('/')
+            t1 = dt.datetime(int(start_date[2]),int(start_date[1]),int(start_date[0]))
+        except IndexError:
+            msg.askokcancel("Confirm", "Please enter a valid start date")
+
+        try:
+            end_date = end.get(1.0, tk.END).strip('\n')
+            end_date = end_date.split('/')
+            t2 = dt.datetime(int(end_date[2]),int(end_date[1]),int(end_date[0]))
+        except IndexError:
+            msg.askokcancel("Confirm", "Please enter a valid end date")
+        try:
+            t = t2-t1
+            return t.days
+        except UnboundLocalError:
+            pass
+        
+    # Function used to calculate conversion from one unit to other
+    # ----------------------------------------------------
     def calculate_conversion(self, event=None):
         units = ['curies', 'millicuries', 'microcuries', 'nanocuries',
                  'bq', 'kbq', 'mbq', 'gbq', 'tbq']
@@ -279,23 +427,8 @@ class Root(tk.Tk):
 
         conversion = conv_list[unit_num_start][unit_num_end]
         val = val * conversion
-        self.new_value = tk.Label(self.frame_three, text=str(val), width=10)
+        self.new_value = tk.Label(self.frame_three, text='{:.2e}'.format(val), width=10)
         self.new_value.grid(row=0, column=1)
-
-
-        # ci_list = [1E0, 1E3, 1E6, 1E9, 3.7E10, 3.7E7, 3.7E4, 3.7E1, 3.7E-2]
-        # mci_list = [1E-3, 1E0, 1E3, 1E6, 3.7E7, 3.7E4, 3.7E1, 3.7E-2, 3.7E-5]
-        # uci_list = [1E-6, 1e-3, 1e0, 1e3, 3.7e4, 3.7e1, 3.7e-2, 3.7e-5, 3.7e-8]
-        # nci_list = [1e-9, 1e-6, 1e-3, 1, 3.7e1, 3.7e-2, 3.7e-5, 3.7e-8, 3.7e-11]
-        # bq_list = [2.7e-11, 2.7e-8, 2.7e-5, 2.7e-2, 1, 1e-3, 1e-6, 1e-9, 1e-12]
-        # kbq_list = [2.7e-8, 2.7e-5, 2.7e-2, 2.7e1, 1e3, 1, 1e-3, 1e-6, 1e-9]
-        # mbq_list = [2.7e-5, 2.7e-2, 2.7e1, 2.7e4, 1e6, 1e3, 1, 1e-3, 1e-6]
-        # gbq_list = [2.7e-2, 2.7e1, 2.7e4, 2.7e7, 1e9, 1e6, 1e3, 1, 1e-3]
-        # tbq_list = [2.7e1, 2.7e4, 2.7e7, 2.7e10, 1e12, 1e9, 1e6, 1e3, 1]
-
-
-
-
 
     # Function used to translate user input and add radiations to GUI
     # ----------------------------------------------------
@@ -304,141 +437,7 @@ class Root(tk.Tk):
         ref = self.translate_isotope(isotope, A)
         self.add_radiation(ref)
 
-    # Function used to translate user input and search decay chain
-    # ----------------------------------------------------
-    # def decay_search(self ,event=None ,isotope_input=None):
-    #     isotope, parent_A = self.search(self, isotope_input)
-    #     parent_isotope = isotope+'-'+parent_A
-    #     self.dc = {}
-    #
-    #     self.gen_list = [[parent_isotope]]
-    #     self.dc_list = []
-    #     self.decay_chain_get(1)
-    #     for line in self.gen_list:
-    #         print(line)
 
-    # def decay_chain_get(self,gen_num):
-    #     x = 1
-    #     #cycle through each generation to determine which generation is the current one
-    #     for g in self.gen_list:
-    #         if x == gen_num:
-    #             generation = g
-    #         else:
-    #             x+=1
-    #
-    #     tmp = []
-    #
-    #     #for every isotope in the current generation,
-    #     #calculate each daughter product
-    #     for iso in generation:
-    #         #break down isotope into isotope and A components
-    #         for i in range(len(iso)):
-    #             if iso[i] == '-':
-    #                 isotope = iso[0:i]
-    #                 A = iso.replace(isotope+'-',"")
-    #                 break
-    #
-    #         ref = self.translate_isotope(isotope,A) #get referenc id for isotope
-    #
-    #         branch_list = self.decay_mode_get(ref) #get all branching ratios in a list for that isotope
-    #
-    #         #if the isotope isn't stable, caclulate daughter
-    #         if len(branch_list)>0:
-    #             for branch in branch_list: #loop through all branching ratios
-    #                 decay_modes = self.decay_mode_split(branch) #split all decay modes up into a list in order for single branch
-    #                 new_i,new_A = self.decay_mode_translate(decay_modes,ref,A) #calculate daughter from parent for each branch
-    #                 new_isotope = new_i+'-'+new_A
-    #
-    #                 tmp.append(new_isotope)
-    #     #if the branch ends, stop recursion
-    #     #if the branch keeps going, go deeper
-    #     if len(tmp)>0:
-    #         self.gen_list.append(tmp)
-    #         self.decay_chain_get(x+1)
-    #
-    # def set(key, value):
-    #     keys = key.split('.')
-    #     latest = keys.pop()
-    #     for k in keys:
-    #         self.dc = self.dc.setdefault(k, {})
-    #     self.dc.setdefault(latest, value)
-    #
-    # def decay_mode_get(self,ref=None):
-    #     decay_mode_list=[]
-    #     try:
-    #         for i in range(int(len(self.parents2[ref])/2)):
-    #             decay_mode_list.append(self.parents2[ref]['mode'+str(i+1)])
-    #     except KeyError:
-    #         pass
-    #     return decay_mode_list
-    #
-    # def decay_mode_split(self,branch=None):
-    #     tmp_list = []
-    #     count = 1
-    #     while len(branch) > 0:
-    #         x = branch[:count]
-    #         try:
-    #             if branch[:count+1] == 'EC+':
-    #                 x = branch[:count+3]
-    #                 tmp_list.append(x)
-    #                 branch = branch.replace(x,"")
-    #                 count = 1
-    #             elif x in decay_types:
-    #                 tmp_list.append(x)
-    #                 branch = branch.replace(x,"")
-    #                 count = 1
-    #             else:
-    #                 count+=1
-    #         except IndexError:
-    #             pass
-    #     return tmp_list
-    #
-    # def decay_mode_translate(self,modes=None,ref=None,A=None):
-    #
-    #     Z = int(ref.replace(ref[-4:],""))
-    #     A = int(A)
-    #
-    #     for mode in modes:
-    #         if mode == 'B-':
-    #             Z = Z + 1
-    #         elif mode == 'B+':
-    #             Z = Z - 1
-    #         elif mode == 'EC':
-    #             Z = Z - 1
-    #         elif mode == 'EC+':
-    #             Z = Z - 1
-    #         elif mode == 'EC+B+':
-    #             Z = Z - 1
-    #         elif mode == 'A' or mode == '2A':
-    #             Z = Z - 2
-    #             A = A - 4
-    #         elif mode == '3A':
-    #             Z = Z - 4
-    #             Z = Z - 8
-    #         elif mode == 'N':
-    #             A = A - 1
-    #         elif mode == '2N':
-    #             A = A - 2
-    #         elif mode == '3N':
-    #             A = A - 3
-    #         elif mode == 'P':
-    #             Z = Z - 1
-    #             A = A - 1
-    #         elif mode == '2P':
-    #             Z = Z - 2
-    #             A = A - 2
-    #         elif mode == 'IT':
-    #             A = A - 300
-    #         elif mode == 'D':
-    #             Z = Z - 1
-    #             A = A - 1
-    #         elif mode == 'T':
-    #             Z = Z - 1
-    #             A = A - 3
-    #
-    #     isotope = nuclides_rev[Z]
-    #     return isotope,str(A)
-            
     # function used to acquire information from user input
     # passes input along to acquire radiation data from db
     # ----------------------------------------------------
@@ -517,6 +516,8 @@ class Root(tk.Tk):
             except UnboundLocalError:
                 pass
 
+    # Function used to translate a reference to isotope and atomic #
+    # ----------------------------------------------------   
     def translate_reference(self, ref=None):
         isotope = ref.replace(ref[-4:], "")
         tmp = ref[-3:]
