@@ -30,14 +30,20 @@ class Root(tk.Tk):
         # this data includes the decay mode and branching ratio attached to each reference
         with open('parents2.pickle', 'rb') as handle:
             self.parents2 = pickle.load(handle)
+
+        with open('xray.pickle', 'rb') as handle:
+            self.xray_db = pickle.load(handle)
+            
             
         self.y_rads = []  # gamma
         self.b_rads = []  # beta
         self.a_rads = []  # alpha
+        self.x_rads = [] #x-ray
 
         self.y_I = []  # gamma intensity
         self.b_I = []  # beta intensity
         self.a_I = []  # alpha intensity
+        self.x_level = [] #orbital shell
 
         self.iso = []
         self.hl = []
@@ -58,12 +64,12 @@ class Root(tk.Tk):
         self.conversion_tab = tk.Frame(self.notebook)
         self.decay_tab = tk.Frame(self.notebook)
         self.xray_tab = tk.Frame(self.notebook)
-
+        
         self.notebook.add(self.tori_tab, text='TORI')
+        self.notebook.add(self.xray_tab, text='X-rays')
         self.notebook.add(self.decay_tab, text='Decay')
         self.notebook.add(self.conversion_tab, text='Conversion')
 
-        self.notebook.add(self.xray_tab, text='X-rays')
 
 
 # -------TORI TAB--------------------------------------------
@@ -119,16 +125,16 @@ class Root(tk.Tk):
         # Row 4
         # Create Frame 4
         self.frame_four = tk.Frame(self.tori_tab)
-        self.frame_four.grid(row=4, column=0, sticky=tk.NW)
+        self.frame_four.grid(row=4, column=0, sticky=tk.NSEW)
         
-        self.canvas = tk.Canvas(self.frame_four, width=439, bd=3, relief=tk.RIDGE)  # parent canvas to frame four
-        self.canvas.grid(row=0, column=0)
+        self.canvas = tk.Canvas(self.frame_four, width=439,height=200, bd=3, relief=tk.RIDGE)  # parent canvas to frame four
+        self.canvas.grid(row=0, column=0,sticky=tk.NSEW)
         
         self.vsbar = tk.Scrollbar(self.frame_four, orient=tk.VERTICAL, command=self.canvas.yview)  # create scroll bar to frame four
-        self.vsbar.grid(row=0, column=1, sticky=tk.NS)
+        self.vsbar.grid(row=0, column=1, sticky=tk.NSEW)
         self.canvas.configure(yscrollcommand=self.vsbar.set)  # configure canvas to respond to scrollbar object
 
-        self.radiations_frame = tk.Frame(self.canvas, bd=3,)  # Create frame for radiations to be inserted onto
+        self.radiations_frame = tk.Frame(self.canvas, bd=3, relief=tk.RIDGE)  # Create frame for radiations to be inserted onto
         
         self.canvas.create_window((0, 0), window=self.radiations_frame, anchor=tk.NW)  # create window with radiations frame
         self.radiations_frame.update_idletasks()  # acquire bbox
@@ -288,7 +294,52 @@ class Root(tk.Tk):
         self.end_act_label = tk.Label(self.frame_six, text="Decayed Activity:")
         
         self.end_act_label.grid(row=0, column=0)
+
+# -------X-RAY TAB--------------------------------------------
+
+        # Row 0
+        self.frame_zero = tk.Frame(self.xray_tab, bd=3, relief=tk.RIDGE)
+        self.frame_zero.grid(row=0, column=0, sticky=tk.NSEW)
         
+        self.ele_input_label = tk.Label(self.frame_zero, text="Element:")
+        self.ele_input_label2 = tk.Label(self.frame_zero, text="(Ex: Cs, cs, cesium)")
+        self.ele_input = tk.Text(self.frame_zero, height=1, width=20)
+        self.xray_search_button = tk.Button(self.frame_zero, text='Search')
+
+        self.ele_input_label.grid(row=0, column=0, sticky=tk.NSEW)
+        self.ele_input_label2.grid(row=0, column=2, rowspan=2, sticky=tk.NSEW)
+        self.ele_input.grid(row=0, column=1, sticky=tk.NSEW)
+        self.xray_search_button.grid(row=0, column=3)
+
+        # Row 1
+        self.frame_one = tk.Frame(self.xray_tab, bd=3, relief=tk.RIDGE)
+        self.frame_one.grid(row=1, column=0, sticky=tk.NSEW)
+
+        self.x_label1 = tk.Label(self.frame_one, text="Energy (keV)", width=15, bd=3, relief=tk.RIDGE)
+        self.x_label2 = tk.Label(self.frame_one, text="Orbital Shell", width=15, bd=3, relief=tk.RIDGE)
+
+        self.x_label1.grid(row=0,column=0)
+        self.x_label2.grid(row=0,column=1)
+
+        # Row 2        
+        self.frame_twox = tk.Frame(self.xray_tab)
+        self.frame_twox.grid(row=2, column=0, sticky=tk.NSEW)
+        
+        self.x_canvas = tk.Canvas(self.frame_twox, width=439, height=200, bd=3, relief=tk.RIDGE)  # parent canvas to frame four
+        self.x_canvas.grid(row=0, column=0)
+        
+        self.x_vsbar = tk.Scrollbar(self.frame_twox, orient=tk.VERTICAL, command=self.x_canvas.yview)  # create scroll bar to frame four
+        self.x_vsbar.grid(row=0, column=1, sticky=tk.NS)
+        self.x_canvas.configure(yscrollcommand=self.x_vsbar.set)  # configure canvas to respond to scrollbar object
+
+        self.x_frame = tk.Frame(self.x_canvas, bd=3,relief=tk.RIDGE)  # Create frame for radiations to be inserted onto
+        
+        self.x_canvas.create_window((0, 0), window=self.x_frame, anchor=tk.NW)  # create window with radiations frame
+        self.x_frame.update_idletasks()  # acquire bbox
+        self.x_canvas.configure(scrollregion=self.x_canvas.bbox(tk.ALL))  # configure the canvas to scroll
+
+        self.testlabel = tk.Label(self.x_frame,text='TEST')
+        self.testlabel.grid(row=0,column=0)
 #---------Binds---------------------------------------------
 
         self.bind_all("<MouseWheel>", self.mouse_scroll)
@@ -300,9 +351,15 @@ class Root(tk.Tk):
 
         # CONVERSION TAB
         self.calc_conv_button.bind("<Button-1>", self.calculate_conversion)
-
+        self.start_entry.bind("<Return>", self.calculate_conversion)
+        
         # DECAY TAB
         self.decay_button.bind("<Button-1>", self.calculate_decay)
+        self.iso_input.bind("<Return>", self.calculate_decay)
+        
+        # XRAY TAB
+        self.xray_search_button.bind("<Button-1>", self.search_xrays)
+        self.ele_input.bind("<Return>", self.search_xrays)
 
 
 # ---------Notebook------------------------------------------
@@ -310,6 +367,46 @@ class Root(tk.Tk):
         self.notebook.pack(fill=tk.BOTH,expand=1)
         
 # ---------Functions-----------------------------------------
+
+    def search_xrays(self, event=None):
+        element = (self.ele_input.get(1.0, tk.END).strip('\n')).lower()
+        self.ele_input.delete(1.0, tk.END)
+        element = element[:1].upper() + element[1:]
+        try:
+            Z = nuclides[element]
+        except KeyError:
+            try:
+                Z = nuclides_long[element]
+            except KeyError:
+                msg.askokcancel("Confirm", "Please enter a valid element")
+
+        ref = str(Z) + '0000'
+
+        # clear any existing radiation labels
+        for xr in self.x_rads:
+            xr.destroy()
+        for lvl in self.x_level:
+            lvl.destroy()
+        self.x_rads = []
+        self.x_level = []        
+
+        row = 0
+        for i in range(int(len(self.xray_db[ref])/2)):
+            new_x = tk.Label(self.x_frame,text=self.xray_db[ref]['xray'+str(i+1)],width=15)
+            new_level = tk.Label(self.x_frame,text=self.xray_db[ref]['level'+str(i+1)],width=15)
+
+            new_x.grid(row=row, column=0)
+            new_level.grid(row=row, column=1)
+
+            self.x_rads.append(new_x)
+            self.x_level.append(new_level)
+
+            row+=1
+
+        # reconfigure canvas with updated radiations_frame
+        self.x_canvas.create_window((0, 0), window=self.x_frame, anchor=tk.NW)
+        self.x_frame.update_idletasks()
+        self.x_canvas.configure(scrollregion=self.x_canvas.bbox(tk.ALL))
 
     # Function used to calculate decay from start to end date with original activity
     # ----------------------------------------------------   
@@ -702,16 +799,19 @@ class Root(tk.Tk):
             outputlist.append(tmp)
 
         # print data to a text file
-        with open(self.isotope_print+'.txt', 'w') as f:
-            f.write('Gamma-Rays'+','+''+','+'Beta-Particles'+','+''+','+'Alpha-Particles'+'\n')
-            f.write('Energy(keV)'+','+'Intensity%'+','+'Energy(keV)'+','+'Intensity%'+','+'Energy(keV)'+','+'Intensity%'+'\n')
-            for line in outputlist:
-                for i in range(len(line)):
-                    if i != len(line)-1:
-                        f.write(line[i]+",")
-                    else:
-                        f.write(line[i])
-                f.write('\n')
+        try:
+            with open(self.isotope_print+'.txt', 'w') as f:
+                f.write('Gamma-Rays'+','+''+','+'Beta-Particles'+','+''+','+'Alpha-Particles'+'\n')
+                f.write('Energy(keV)'+','+'Intensity%'+','+'Energy(keV)'+','+'Intensity%'+','+'Energy(keV)'+','+'Intensity%'+'\n')
+                for line in outputlist:
+                    for i in range(len(line)):
+                        if i != len(line)-1:
+                            f.write(line[i]+",")
+                        else:
+                            f.write(line[i])
+                    f.write('\n')
+        except AttributeError:
+            pass
                 
     # allow the use of the mouse wheel to scroll
     # ----------------------------------------------------
